@@ -1,0 +1,95 @@
+/* ── DARK THEME (Default) ── */
+.theme-dark {
+  --bg: #0d0d0d;
+  --bg2: #111111;
+  --surface: #161616;
+  --surface2: #1e1e1e;
+  --surface3: #242424;
+  --border: #2a2a2a;
+  --border2: #333333;
+  --text: #ececec;
+  --text2: #999999;
+  --text3: #555555;
+  --accent: #38bdf8;
+  --accent2: #0ea5e9;
+  --accent-glow: rgba(56,189,248,0.1);
+  --accent-hover: #7dd3fc;
+  --green: #3dd68c;
+  --red: #ff5f5f;
+  --yellow: #f5a623;
+  --shadow: rgba(0,0,0,0.4);
+  --input-bg: #1a1a1a;
+  --sidebar-bg: #111111;
+  --topbar-bg: #0d0d0d;
+  --chat-bg: #0d0d0d;
+  --user-bubble: rgba(56,189,248,0.08);
+  --user-bubble-border: rgba(56,189,248,0.2);
+  --ai-bubble: #161616;
+  --ai-bubble-border: #2a2a2a;
+  --code-bg: #0a0a0a;
+  --scrollbar: #2a2a2a;
+}
+
+/* ── LIGHT THEME ── */
+.theme-light {
+  --bg: #ffffff;
+  --bg2: #f8f9fa;
+  --surface: #f1f3f5;
+  --surface2: #e9ecef;
+  --surface3: #dee2e6;
+  --border: #dee2e6;
+  --border2: #ced4da;
+  --text: #1a1a2e;
+  --text2: #6c757d;
+  --text3: #adb5bd;
+  --accent: #0284c7;
+  --accent2: #0369a1;
+  --accent-glow: rgba(2,132,199,0.08);
+  --accent-hover: #0369a1;
+  --green: #16a34a;
+  --red: #dc2626;
+  --yellow: #d97706;
+  --shadow: rgba(0,0,0,0.08);
+  --input-bg: #ffffff;
+  --sidebar-bg: #f1f3f5;
+  --topbar-bg: #ffffff;
+  --chat-bg: #ffffff;
+  --user-bubble: rgba(2,132,199,0.06);
+  --user-bubble-border: rgba(2,132,199,0.15);
+  --ai-bubble: #f8f9fa;
+  --ai-bubble-border: #dee2e6;
+  --code-bg: #1e1e1e;
+  --scrollbar: #dee2e6;
+}
+
+/* ── BASE ── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  display: flex;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* ── SELECTION ── */
+::selection { background: var(--accent-glow); color: var(--accent); }
