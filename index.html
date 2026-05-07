@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dev.ai Studio</title>
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/sidebar.css">
+<link rel="stylesheet" href="css/chat.css">
+<link rel="stylesheet" href="css/modals.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="theme-dark">
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      Dev.ai Studio
+    </div>
+    <button class="new-chat-btn" onclick="newChat()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      New Chat
+    </button>
+  </div>
+
+  <div class="sidebar-scroll">
+    <div class="sidebar-label">Tools</div>
+    <div class="sidebar-item" onclick="openEditor()">
+      <span class="item-icon">⌨</span>
+      <span class="item-text">Code Editor</span>
+    </div>
+    <div class="sidebar-item" onclick="openTerminal()">
+      <span class="item-icon">⬛</span>
+      <span class="item-text">Terminal</span>
+    </div>
+
+    <div class="sidebar-label">Integrations</div>
+    <div class="sidebar-item" onclick="openSettings('github')">
+      <img src="assets/logos/github.svg" class="item-logo"> 
+      <span class="item-text">GitHub</span>
+      <span class="item-badge" id="badge-github">—</span>
+    </div>
+    <div class="sidebar-item" onclick="openSettings('vercel')">
+      <img src="assets/logos/vercel.svg" class="item-logo">
+      <span class="item-text">Vercel</span>
+      <span class="item-badge" id="badge-vercel">—</span>
+    </div>
+    <div class="sidebar-item" onclick="openSettings('netlify')">
+      <img src="assets/logos/netlify.svg" class="item-logo">
+      <span class="item-text">Netlify</span>
+      <span class="item-badge" id="badge-netlify">—</span>
+    </div>
+    <div class="sidebar-item" onclick="openSettings('render')">
+      <img src="assets/logos/render.svg" class="item-logo">
+      <span class="item-text">Render</span>
+      <span class="item-badge" id="badge-render">—</span>
+    </div>
+    <div class="sidebar-item" onclick="openSettings('railway')">
+      <img src="assets/logos/railway.svg" class="item-logo">
+      <span class="item-text">Railway</span>
+      <span class="item-badge" id="badge-railway">—</span>
+    </div>
+    <div class="sidebar-item" onclick="openSettings('cloudflare')">
+      <img src="assets/logos/cloudflare.svg" class="item-logo">
+      <span class="item-text">Cloudflare</span>
+      <span class="item-badge" id="badge-cloudflare">—</span>
+    </div>
+    <div class="sidebar-item" onclick="openSettings('codemagic')">
+      <img src="assets/logos/codemagic.svg" class="item-logo">
+      <span class="item-text">Codemagic (APK)</span>
+      <span class="item-badge" id="badge-codemagic">—</span>
+    </div>
+
+    <div class="sidebar-label">History</div>
+    <div id="historyList" class="history-list">
+      <div class="history-empty">No chats yet</div>
+    </div>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="sidebar-item" onclick="toggleTheme()">
+      <span class="item-icon" id="themeIcon">☀</span>
+      <span class="item-text" id="themeLabel">Light Mode</span>
+    </div>
+    <div class="sidebar-item" onclick="openSettings('general')">
+      <span class="item-icon">⚙</span>
+      <span class="item-text">Settings</span>
+    </div>
+    <div class="sidebar-item" id="userItem" onclick="handleAuth()">
+      <span class="item-icon">👤</span>
+      <span class="item-text" id="userLabel">Login with Puter</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+
+    <div class="model-selector-wrap">
+      <button class="model-selector" onclick="toggleModelDropdown()">
+        <span class="model-dot"></span>
+        <span id="modelName">Claude 3.5 Sonnet</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6,9 12,15 18,9"/>
+        </svg>
+      </button>
+      <div class="model-dropdown" id="modelDropdown"></div>
+    </div>
+
+    <div class="topbar-right">
+      <button class="icon-btn" onclick="toggleTokenBar()" title="Add Token">🔑</button>
+      <button class="icon-btn" onclick="openEditor()" title="Code Editor">⌨</button>
+    </div>
+  </div>
+
+  <!-- CHAT AREA -->
+  <div class="chat-area" id="chatArea">
+    <div class="welcome" id="welcomeScreen">
+      <div class="welcome-logo">⚡</div>
+      <h1>Dev.ai Studio</h1>
+      <p>AI-powered coding assistant। Code लिखो, deploy करो, APK बनाओ।</p>
+      <div class="suggestions" id="suggestions"></div>
+    </div>
+    <div class="messages" id="messages"></div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-area">
+    <div class="input-wrap">
+      <div class="input-box" id="inputBox">
+        <!-- Token bar -->
+        <div class="token-bar" id="tokenBar">
+          <span class="token-label">🔑</span>
+          <input class="token-input" id="inlineTokenInput" type="password" placeholder="Token paste करें (GitHub / Vercel / Netlify...)">
+          <button class="token-eye" onclick="toggleTokenVisibility()" id="tokenEye">👁</button>
+          <button class="token-save-btn" onclick="saveInlineToken()">Save</button>
+          <button class="token-close-btn" onclick="hideTokenBar()">×</button>
+        </div>
+        <div class="input-main">
+          <!-- Plus button -->
+          <div class="plus-wrap">
+            <button class="plus-btn" onclick="togglePlusMenu()" id="plusBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </button>
+            <div class="plus-menu" id="plusMenu">
+              <div class="plus-item" onclick="uploadImage()">🖼 Image Upload</div>
+              <div class="plus-item" onclick="uploadFile()">📎 File Upload</div>
+              <div class="plus-item" onclick="openCamera()">📷 Camera</div>
+            </div>
+          </div>
+          <textarea id="mainInput" rows="1" placeholder="कुछ भी पूछो..."></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22,2 15,22 11,13 2,9"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="input-hint">Powered by Puter.js · 100% Free</div>
+    </div>
+  </div>
+</div>
+
+<!-- PANELS -->
+<div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+
+<!-- Settings Panel -->
+<div class="panel" id="settingsPanel">
+  <div class="panel-header">
+    <span>⚙</span>
+    <div class="panel-title">Settings</div>
+    <button class="panel-close" onclick="closePanel()">×</button>
+  </div>
+  <div class="settings-body" id="settingsBody"></div>
+</div>
+
+<!-- Editor Panel -->
+<div class="panel panel-wide" id="editorPanel">
+  <div class="panel-header">
+    <span>⌨</span>
+    <div class="panel-title">Code Editor</div>
+    <div class="panel-actions">
+      <button class="panel-btn" onclick="saveAllFiles()">💾 Save</button>
+      <button class="panel-btn primary" onclick="pushToGithub()">🐙 Push</button>
+    </div>
+    <button class="panel-close" onclick="closePanel()">×</button>
+  </div>
+  <div class="editor-tabs-bar" id="editorTabsBar"></div>
+  <div class="editor-wrap">
+    <div class="line-nums" id="lineNums">1</div>
+    <textarea id="codeEditor" spellcheck="false"></textarea>
+  </div>
+  <div class="editor-statusbar">
+    <span id="editorLang">JavaScript</span>
+    <span id="editorCursor">Ln 1, Col 1</span>
+  </div>
+</div>
+
+<!-- Terminal Panel -->
+<div class="panel panel-wide" id="terminalPanel">
+  <div class="panel-header">
+    <span>⬛</span>
+    <div class="panel-title">Terminal</div>
+    <button class="panel-close" onclick="closePanel()">×</button>
+  </div>
+  <div class="terminal-body" id="terminalBody">
+    <span class="t-info">Dev.ai Studio — Terminal Ready</span><br>
+  </div>
+</div>
+
+<!-- Hidden file inputs -->
+<input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
+<input type="file" id="fileInput" style="display:none" onchange="handleFileUpload(this)">
+<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleImageUpload(this)">
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Scripts -->
+<script src="https://js.puter.com/v2/"></script>
+<script type="module" src="js/firebase.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
