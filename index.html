@@ -13,8 +13,8 @@
 </head>
 <body class="theme-dark">
 
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
+<!-- SIDEBAR (closed by default) -->
+<div class="sidebar closed" id="sidebar">
   <div class="sidebar-header">
     <div class="logo">
       <div class="logo-dot"></div>
@@ -41,12 +41,12 @@
 
     <div class="sidebar-label">Integrations</div>
     <div class="sidebar-item" onclick="openSettings('github')">
-      <img src="assets/logos/github.svg" class="item-logo"> 
+      <img src="assets/logos/github.svg" class="item-logo" style="filter:invert(1) brightness(0.7);">
       <span class="item-text">GitHub</span>
       <span class="item-badge" id="badge-github">—</span>
     </div>
     <div class="sidebar-item" onclick="openSettings('vercel')">
-      <img src="assets/logos/vercel.svg" class="item-logo">
+      <img src="assets/logos/vercel.svg" class="item-logo" style="filter:invert(1) brightness(0.7);">
       <span class="item-text">Vercel</span>
       <span class="item-badge" id="badge-vercel">—</span>
     </div>
@@ -100,7 +100,6 @@
 
 <!-- MAIN -->
 <div class="main" id="main">
-  <!-- TOPBAR -->
   <div class="topbar">
     <button class="menu-btn" onclick="toggleSidebar()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -109,7 +108,6 @@
         <line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
     </button>
-
     <div class="model-selector-wrap">
       <button class="model-selector" onclick="toggleModelDropdown()">
         <span class="model-dot"></span>
@@ -120,42 +118,39 @@
       </button>
       <div class="model-dropdown" id="modelDropdown"></div>
     </div>
-
     <div class="topbar-right">
       <button class="icon-btn" onclick="toggleTokenBar()" title="Add Token">🔑</button>
       <button class="icon-btn" onclick="openEditor()" title="Code Editor">⌨</button>
     </div>
   </div>
 
-  <!-- CHAT AREA -->
   <div class="chat-area" id="chatArea">
     <div class="welcome" id="welcomeScreen">
       <div class="welcome-logo">⚡</div>
       <h1>Dev.ai Studio</h1>
-      <p>AI-powered coding assistant। Code लिखो, deploy करो, APK बनाओ।</p>
+      <p>AI-powered coding assistant। Code लिखो, deploy करो, APK बनाओ — सब free में।</p>
       <div class="suggestions" id="suggestions"></div>
     </div>
-    <div class="messages" id="messages"></div>
+    <div class="messages" id="messages" style="display:none;"></div>
   </div>
 
-  <!-- INPUT -->
   <div class="input-area">
     <div class="input-wrap">
       <div class="input-box" id="inputBox">
-        <!-- Token bar -->
         <div class="token-bar" id="tokenBar">
           <span class="token-label">🔑</span>
-          <input class="token-input" id="inlineTokenInput" type="password" placeholder="Token paste करें (GitHub / Vercel / Netlify...)">
+          <input class="token-input" id="inlineTokenInput" type="password"
+                 placeholder="Token paste करें (GitHub / Vercel / Netlify...)">
           <button class="token-eye" onclick="toggleTokenVisibility()" id="tokenEye">👁</button>
           <button class="token-save-btn" onclick="saveInlineToken()">Save</button>
           <button class="token-close-btn" onclick="hideTokenBar()">×</button>
         </div>
         <div class="input-main">
-          <!-- Plus button -->
           <div class="plus-wrap">
-            <button class="plus-btn" onclick="togglePlusMenu()" id="plusBtn">
+            <button class="plus-btn" onclick="togglePlusMenu()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
             </button>
             <div class="plus-menu" id="plusMenu">
@@ -164,7 +159,8 @@
               <div class="plus-item" onclick="openCamera()">📷 Camera</div>
             </div>
           </div>
-          <textarea id="mainInput" rows="1" placeholder="कुछ भी पूछो..."></textarea>
+          <textarea id="mainInput" rows="1"
+                    placeholder="कुछ भी पूछो — code लिखो, deploy करो, push करो..."></textarea>
           <button class="send-btn" id="sendBtn" onclick="sendMessage()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <line x1="22" y1="2" x2="11" y2="13"/>
@@ -173,7 +169,9 @@
           </button>
         </div>
       </div>
-      <div class="input-hint">Powered by Puter.js · 100% Free</div>
+      <div class="input-hint">
+        Powered by Puter.js · 100% Free · <span id="modelStatus">Connecting...</span>
+      </div>
     </div>
   </div>
 </div>
@@ -181,7 +179,6 @@
 <!-- PANELS -->
 <div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
 
-<!-- Settings Panel -->
 <div class="panel" id="settingsPanel">
   <div class="panel-header">
     <span>⚙</span>
@@ -191,7 +188,6 @@
   <div class="settings-body" id="settingsBody"></div>
 </div>
 
-<!-- Editor Panel -->
 <div class="panel panel-wide" id="editorPanel">
   <div class="panel-header">
     <span>⌨</span>
@@ -208,34 +204,115 @@
     <textarea id="codeEditor" spellcheck="false"></textarea>
   </div>
   <div class="editor-statusbar">
-    <span id="editorLang">JavaScript</span>
+    <span id="editorLang">HTML</span>
     <span id="editorCursor">Ln 1, Col 1</span>
   </div>
 </div>
 
-<!-- Terminal Panel -->
 <div class="panel panel-wide" id="terminalPanel">
   <div class="panel-header">
     <span>⬛</span>
-    <div class="panel-title">Terminal</div>
+    <div class="panel-title">Terminal / Output</div>
     <button class="panel-close" onclick="closePanel()">×</button>
   </div>
   <div class="terminal-body" id="terminalBody">
     <span class="t-info">Dev.ai Studio — Terminal Ready</span><br>
+    <span class="t-dim">$ </span>AI operations यहाँ show होंगी...<br>
   </div>
 </div>
 
-<!-- Hidden file inputs -->
+<!-- Hidden inputs -->
 <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
 <input type="file" id="fileInput" style="display:none" onchange="handleFileUpload(this)">
 <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleImageUpload(this)">
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- Scripts -->
+<!-- Puter.js (FREE AI - load first) -->
 <script src="https://js.puter.com/v2/"></script>
-<script type="module" src="js/firebase.js"></script>
-<script type="module" src="js/app.js"></script>
+
+<!-- Main module -->
+<script type="module">
+import { initModels } from './js/ai.js';
+import { initChat, sendMessage, newChat } from './js/chat.js';
+import {
+  toggleSidebar, toggleTheme, handleAuth,
+  openSettings, closePanel, openEditor, openTerminal,
+  toggleTokenBar, hideTokenBar, toggleTokenVisibility, saveInlineToken,
+  togglePlusMenu, uploadImage, uploadFile, openCamera,
+  handleImageUpload, handleFileUpload,
+  saveAllFiles, pushToGithub, showToast, updateBadges
+} from './js/app.js';
+
+// Expose functions globally for HTML onclick
+Object.assign(window, {
+  toggleSidebar, toggleTheme, handleAuth,
+  openSettings, closePanel, openEditor, openTerminal,
+  toggleTokenBar, hideTokenBar, toggleTokenVisibility, saveInlineToken,
+  togglePlusMenu, uploadImage, uploadFile, openCamera,
+  handleImageUpload, handleFileUpload,
+  saveAllFiles, pushToGithub, sendMessage, newChat, showToast
+});
+
+// ── APP INIT ──
+document.addEventListener('DOMContentLoaded', async () => {
+
+  // 1. Apply saved theme instantly
+  const savedTheme = localStorage.getItem('devai_theme') || 'dark';
+  document.body.className = `theme-${savedTheme}`;
+  const themeIcon = document.getElementById('themeIcon');
+  const themeLabel = document.getElementById('themeLabel');
+  if (themeIcon) themeIcon.textContent = savedTheme === 'dark' ? '☀' : '🌙';
+  if (themeLabel) themeLabel.textContent = savedTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+
+  // 2. Init models dropdown
+  initModels();
+
+  // 3. Init chat (suggestions etc)
+  initChat();
+
+  // 4. Puter.js init
+  const statusEl = document.getElementById('modelStatus');
+  try {
+    if (typeof puter !== 'undefined') {
+      if (statusEl) statusEl.textContent = 'Puter.js Ready ✓';
+
+      // Check silent login
+      const isSignedIn = await puter.auth.isSignedIn().catch(() => false);
+      if (isSignedIn) {
+        const user = await puter.auth.getUser().catch(() => null);
+        if (user) {
+          window.__puterUser = user;
+          window.__puterUID = user.uuid;
+
+          // Update UI
+          const label = document.getElementById('userLabel');
+          const icon = document.querySelector('#userItem .item-icon');
+          if (label) label.textContent = user.username || 'Logged In';
+          if (icon) icon.textContent = '✓';
+          if (statusEl) statusEl.textContent = `✓ ${user.username || 'User'}`;
+
+          // Save to Firebase
+          const { saveUser, loadTokens, loadSettings } = await import('./js/firebase.js');
+          await saveUser(user);
+
+          // Load saved tokens
+          const { STATE } = await import('./js/app.js');
+          const tokens = await loadTokens(user.uuid);
+          if (tokens) Object.assign(STATE.tokens, tokens);
+          updateBadges();
+        }
+      }
+    } else {
+      if (statusEl) statusEl.textContent = 'Ready (no Puter)';
+    }
+  } catch(e) {
+    if (statusEl) statusEl.textContent = 'Ready';
+    console.warn('Puter init error:', e);
+  }
+});
+</script>
+
 </body>
-</html>
+  </html>
+  
