@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Dev.ai Studio</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/variables.css">
@@ -11,96 +11,127 @@
 <link rel="stylesheet" href="css/chat.css">
 <link rel="stylesheet" href="css/modals.css">
 <style>
-/* Extra inline fixes */
-.topbar-login {
-  display:flex; align-items:center; gap:8px;
-  padding:6px 14px; border-radius:8px;
-  background:var(--accent); border:none;
-  color:#fff; font-family:'DM Sans',sans-serif;
-  font-size:13px; font-weight:600; cursor:pointer;
-  transition:background 0.15s;
-}
-.topbar-login:hover { background:var(--accent2); }
-.topbar-login.logged { background:var(--surface2); color:var(--text2); border:1px solid var(--border); }
-.topbar-login.logged:hover { border-color:var(--red); color:var(--red); }
+/* ── MOBILE FIXES ── */
+* { -webkit-tap-highlight-color: transparent; }
 
-.user-avatar {
-  width:28px; height:28px; border-radius:50%;
-  background:var(--accent-glow); border:2px solid var(--accent);
-  display:flex; align-items:center; justify-content:center;
-  font-size:12px; font-weight:700; color:var(--accent);
+.topbar { padding: 0 12px; gap: 8px; }
+.topbar-login {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 20px;
+  background: var(--accent); border: none;
+  color: #fff; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: all 0.15s; white-space: nowrap;
 }
+.topbar-login:hover { background: var(--accent2); }
+.topbar-login.logged {
+  background: var(--surface2); color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.user-chip {
+  display: flex; align-items: center; gap: 7px;
+  padding: 4px 10px 4px 4px; border-radius: 20px;
+  background: var(--surface2); border: 1px solid var(--border);
+  cursor: pointer; transition: all 0.15s;
+}
+.user-chip:hover { border-color: var(--red); }
+.user-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.user-name { font-size: 12px; font-weight: 600; color: var(--text); max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Mic button */
+.mic-btn {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: none; border: 1px solid var(--border);
+  color: var(--text2); cursor: pointer; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.12s; flex-shrink: 0;
+}
+.mic-btn:hover { color: var(--text); border-color: var(--border2); }
+.mic-btn.recording { background: rgba(239,68,68,0.1); border-color: var(--red); color: var(--red); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .sidebar { width: 85vw; }
+  .panel, .panel.panel-wide { width: 100vw !important; }
+  .suggestions { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .suggestion { padding: 10px 12px; }
+  .welcome h1 { font-size: 22px; }
+  .welcome p { font-size: 13px; }
+  .model-selector span:not(.model-dot) { display: none; }
+  .model-selector { padding: 6px 8px; }
+  .topbar { height: 48px; }
+  .msg-body { max-width: 88%; }
+  .messages { padding: 12px 14px; }
+}
+
+/* Sidebar overlay for mobile */
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4); z-index: 49;
+}
+.sidebar-overlay.show { display: block; }
 </style>
 </head>
 <body class="theme-light" id="appBody">
 
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <!-- SIDEBAR -->
 <div class="sidebar closed" id="sidebar">
   <div class="sidebar-header">
-    <div class="logo">
-      <div class="logo-dot"></div>
-      Dev.ai Studio
-    </div>
+    <div class="logo"><div class="logo-dot"></div>Dev.ai Studio</div>
     <button class="new-chat-btn" onclick="newChat()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
-      New Chat
+      </svg> New Chat
     </button>
   </div>
 
   <div class="sidebar-scroll">
     <div class="sidebar-label">Tools</div>
-    <div class="sidebar-item" onclick="openEditor()">
-      <span class="item-icon">⌨</span>
-      <span class="item-text">Code Editor</span>
-    </div>
-    <div class="sidebar-item" onclick="openTerminalPanel()">
-      <span class="item-icon">⬛</span>
-      <span class="item-text">Terminal</span>
-    </div>
+    <div class="sidebar-item" onclick="openEditor();closeSidebar()"><span class="item-icon">⌨</span><span class="item-text">Code Editor</span></div>
+    <div class="sidebar-item" onclick="openTerminalPanel();closeSidebar()"><span class="item-icon">⬛</span><span class="item-text">Terminal</span></div>
 
     <div class="sidebar-label">Integrations</div>
-    <div class="sidebar-item" onclick="openSettings('github')">
-      <img src="assets/logos/github.svg" class="item-logo" id="logo-github">
-      <span class="item-text">GitHub</span>
-      <span class="item-badge" id="badge-github">—</span>
+    <div class="sidebar-item" onclick="openSettings('github');closeSidebar()">
+      <img src="assets/logos/github.svg" class="item-logo" id="ghLogo" style="width:16px;height:16px">
+      <span class="item-text">GitHub</span><span class="item-badge" id="badge-github">—</span>
     </div>
-    <div class="sidebar-item" onclick="openSettings('vercel')">
-      <img src="assets/logos/vercel.svg" class="item-logo" id="logo-vercel">
-      <span class="item-text">Vercel</span>
-      <span class="item-badge" id="badge-vercel">—</span>
+    <div class="sidebar-item" onclick="openSettings('vercel');closeSidebar()">
+      <img src="assets/logos/vercel.svg" class="item-logo" id="vLogo" style="width:16px;height:16px">
+      <span class="item-text">Vercel</span><span class="item-badge" id="badge-vercel">—</span>
     </div>
-    <div class="sidebar-item" onclick="openSettings('netlify')">
-      <img src="assets/logos/netlify.svg" class="item-logo">
-      <span class="item-text">Netlify</span>
-      <span class="item-badge" id="badge-netlify">—</span>
+    <div class="sidebar-item" onclick="openSettings('netlify');closeSidebar()">
+      <img src="assets/logos/netlify.svg" class="item-logo" style="width:16px;height:16px">
+      <span class="item-text">Netlify</span><span class="item-badge" id="badge-netlify">—</span>
     </div>
-    <div class="sidebar-item" onclick="openSettings('render')">
-      <img src="assets/logos/render.svg" class="item-logo">
-      <span class="item-text">Render</span>
-      <span class="item-badge" id="badge-render">—</span>
+    <div class="sidebar-item" onclick="openSettings('render');closeSidebar()">
+      <img src="assets/logos/render.svg" class="item-logo" style="width:16px;height:16px">
+      <span class="item-text">Render</span><span class="item-badge" id="badge-render">—</span>
     </div>
-    <div class="sidebar-item" onclick="openSettings('railway')">
-      <img src="assets/logos/railway.svg" class="item-logo">
-      <span class="item-text">Railway</span>
-      <span class="item-badge" id="badge-railway">—</span>
+    <div class="sidebar-item" onclick="openSettings('railway');closeSidebar()">
+      <img src="assets/logos/railway.svg" class="item-logo" style="width:16px;height:16px">
+      <span class="item-text">Railway</span><span class="item-badge" id="badge-railway">—</span>
     </div>
-    <div class="sidebar-item" onclick="openSettings('cloudflare')">
-      <img src="assets/logos/cloudflare.svg" class="item-logo">
-      <span class="item-text">Cloudflare</span>
-      <span class="item-badge" id="badge-cloudflare">—</span>
+    <div class="sidebar-item" onclick="openSettings('cloudflare');closeSidebar()">
+      <img src="assets/logos/cloudflare.svg" class="item-logo" style="width:16px;height:16px">
+      <span class="item-text">Cloudflare</span><span class="item-badge" id="badge-cloudflare">—</span>
     </div>
-    <div class="sidebar-item" onclick="openSettings('codemagic')">
-      <img src="assets/logos/codemagic.svg" class="item-logo">
-      <span class="item-text">Codemagic (APK)</span>
-      <span class="item-badge" id="badge-codemagic">—</span>
+    <div class="sidebar-item" onclick="openSettings('codemagic');closeSidebar()">
+      <img src="assets/logos/codemagic.svg" class="item-logo" style="width:16px;height:16px">
+      <span class="item-text">Codemagic (APK)</span><span class="item-badge" id="badge-codemagic">—</span>
     </div>
 
     <div class="sidebar-label">History</div>
-    <div id="historyList" class="history-list">
-      <div class="history-empty">No chats yet</div>
-    </div>
+    <div id="historyList" class="history-list"><div class="history-empty">No chats yet</div></div>
   </div>
 
   <div class="sidebar-bottom">
@@ -108,9 +139,8 @@
       <span class="item-icon" id="themeIcon">🌙</span>
       <span class="item-text" id="themeLabel">Dark Mode</span>
     </div>
-    <div class="sidebar-item" onclick="openSettings('general')">
-      <span class="item-icon">⚙</span>
-      <span class="item-text">Settings</span>
+    <div class="sidebar-item" onclick="openSettings('general');closeSidebar()">
+      <span class="item-icon">⚙</span><span class="item-text">Settings</span>
     </div>
   </div>
 </div>
@@ -122,40 +152,36 @@
   <div class="topbar">
     <button class="menu-btn" onclick="toggleSidebar()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="3" y1="6" x2="21" y2="6"/>
-        <line x1="3" y1="12" x2="21" y2="12"/>
-        <line x1="3" y1="18" x2="21" y2="18"/>
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
     </button>
 
     <div class="model-selector-wrap">
       <button class="model-selector" onclick="toggleModelDropdown()">
         <span class="model-dot"></span>
-        <span id="modelName">Claude 3.5 Sonnet</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="6,9 12,15 18,9"/>
-        </svg>
+        <span id="modelName">claude-3-5-sonnet</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6,9 12,15 18,9"/></svg>
       </button>
       <div class="model-dropdown" id="modelDropdown"></div>
     </div>
 
     <div class="topbar-right">
-      <button class="icon-btn" onclick="toggleTokenBar()" title="Add Token">🔑</button>
-      <button class="icon-btn" onclick="openEditor()" title="Code Editor">⌨</button>
-      <!-- LOGIN BUTTON -->
-      <button class="topbar-login" id="loginBtn" onclick="handleAuth()">
-        <span id="loginBtnIcon">👤</span>
-        <span id="loginBtnText">Login / Sign Up</span>
-      </button>
+      <button class="icon-btn" onclick="toggleTokenBar()" title="Token">🔑</button>
+      <!-- LOGIN / USER CHIP -->
+      <div id="authArea">
+        <button class="topbar-login" id="loginBtn" onclick="handleAuth()">
+          <span>👤</span> Login
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- CHAT AREA -->
+  <!-- CHAT -->
   <div class="chat-area" id="chatArea">
     <div class="welcome" id="welcomeScreen">
       <div class="welcome-logo">⚡</div>
       <h1>Dev.ai Studio</h1>
-      <p>AI-powered coding assistant। Code लिखो, deploy करो, APK बनाओ — सब free में।</p>
+      <p>AI coding assistant — Code लिखो, deploy करो, APK बनाओ।</p>
       <div class="suggestions" id="suggestions"></div>
     </div>
     <div class="messages" id="messages" style="display:none;"></div>
@@ -168,37 +194,37 @@
         <!-- Token bar -->
         <div class="token-bar" id="tokenBar">
           <span class="token-label">🔑</span>
-          <input class="token-input" id="inlineTokenInput" type="password"
-                 placeholder="Token paste करें (GitHub / Vercel / Netlify...)">
-          <button class="token-eye" onclick="toggleTokenVisibility()" id="tokenEye">👁</button>
+          <input class="token-input" id="inlineTokenInput" type="password" placeholder="Token paste करें...">
+          <button class="token-eye" onclick="toggleTokenVis()" id="tokenEye">👁</button>
           <button class="token-save-btn" onclick="saveInlineToken()">Save</button>
           <button class="token-close-btn" onclick="hideTokenBar()">×</button>
         </div>
-        <!-- Input row -->
         <div class="input-main">
+          <!-- Plus -->
           <div class="plus-wrap">
             <button class="plus-btn" onclick="togglePlusMenu()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
             </button>
             <div class="plus-menu" id="plusMenu">
-              <div class="plus-item" onclick="uploadImage()">🖼 Image Upload</div>
-              <div class="plus-item" onclick="uploadFile()">📎 File Upload</div>
+              <div class="plus-item" onclick="uploadImage()">🖼 Image</div>
+              <div class="plus-item" onclick="uploadFile()">📎 File</div>
               <div class="plus-item" onclick="openCamera()">📷 Camera</div>
             </div>
           </div>
           <textarea id="mainInput" rows="1" placeholder="कुछ भी पूछो..."></textarea>
+          <!-- Mic -->
+          <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Voice Input">🎤</button>
+          <!-- Send -->
           <button class="send-btn" id="sendBtn" onclick="sendMessage()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="22" y1="2" x2="11" y2="13"/>
-              <polygon points="22,2 15,22 11,13 2,9"/>
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/>
             </svg>
           </button>
         </div>
       </div>
-      <div class="input-hint">Powered by Puter.js · 100% Free · <span id="modelStatus">Loading...</span></div>
+      <div class="input-hint">Puter.js · Free · <span id="modelStatus">Loading...</span></div>
     </div>
   </div>
 </div>
@@ -218,8 +244,8 @@
   <div class="panel-header">
     <span>⌨</span><div class="panel-title">Code Editor</div>
     <div class="panel-actions">
-      <button class="panel-btn" onclick="saveAllFiles()">💾 Save</button>
-      <button class="panel-btn primary" onclick="doPushToGithub()">🐙 Push</button>
+      <button class="panel-btn" onclick="saveAllFiles()">💾</button>
+      <button class="panel-btn primary" onclick="doPush()">🐙 Push</button>
     </div>
     <button class="panel-close" onclick="closePanel()">×</button>
   </div>
@@ -239,857 +265,143 @@
     <span>⬛</span><div class="panel-title">Terminal</div>
     <button class="panel-close" onclick="closePanel()">×</button>
   </div>
-  <div class="terminal-body" id="terminalBody">
-    <span class="t-info">Dev.ai Studio — Terminal Ready</span><br>
-  </div>
+  <div class="terminal-body" id="terminalBody"><span class="t-info">Dev.ai Studio Terminal Ready</span><br></div>
 </div>
 
-<input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
+<input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleImgUpload(this)">
 <input type="file" id="fileInput" style="display:none" onchange="handleFileUpload(this)">
-<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleImageUpload(this)">
+<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleImgUpload(this)">
 <div class="toast" id="toast"></div>
 
-<!-- Firebase SDK -->
+<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, query, orderBy, limit }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDa_HS5OEDklgP3naQ9KI7j43gv71aIq4g",
-  authDomain: "devai-studio-1545d.firebaseapp.com",
-  projectId: "devai-studio-1545d",
-  storageBucket: "devai-studio-1545d.firebasestorage.app",
-  messagingSenderId: "66229703752",
-  appId: "1:66229703752:web:161715c1b05854c663747d"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-function enc(v) { try { return btoa(unescape(encodeURIComponent(v))); } catch { return v; } }
-function dec(v) { try { return decodeURIComponent(escape(atob(v))); } catch { return v; } }
-
-window.FB = {
-  async saveUser(u) {
-    if (!u?.uuid) return;
-    try {
-      const ref = doc(db,"users",u.uuid);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) {
-        await setDoc(ref, { uid:u.uuid, name:u.username||"User", email:u.email||"", createdAt:new Date().toISOString(), lastSeen:new Date().toISOString() });
-      } else {
-        await updateDoc(ref, { lastSeen: new Date().toISOString() });
-      }
-    } catch(e) { console.warn("FB.saveUser",e); }
-  },
-  async saveTokens(uid, tokens) {
-    if (!uid) return;
-    try {
-      const enc2 = {};
-      for (const [k,v] of Object.entries(tokens)) enc2[k] = v ? enc(v) : "";
-      await setDoc(doc(db,"users",uid,"private","tokens"), enc2, {merge:true});
-    } catch(e) { console.warn("FB.saveTokens",e); }
-  },
-  async loadTokens(uid) {
-    if (!uid) return {};
-    try {
-      const snap = await getDoc(doc(db,"users",uid,"private","tokens"));
-      if (!snap.exists()) return {};
-      const res = {};
-      for (const [k,v] of Object.entries(snap.data())) res[k] = v ? dec(v) : "";
-      return res;
-    } catch(e) { return {}; }
-  },
-  async saveSettings(uid, s) {
-    if (!uid) return;
-    try { await setDoc(doc(db,"users",uid,"settings","prefs"), s, {merge:true}); } catch(e) {}
-  },
-  async loadSettings(uid) {
-    if (!uid) return null;
-    try {
-      const snap = await getDoc(doc(db,"users",uid,"settings","prefs"));
-      return snap.exists() ? snap.data() : null;
-    } catch(e) { return null; }
-  },
-  async saveChatHistory(uid, chatId, msgs) {
-    if (!uid) return;
-    try { await setDoc(doc(db,"users",uid,"chats",chatId), { messages:msgs, updatedAt:new Date().toISOString() }, {merge:true}); } catch(e) {}
-  },
-  async loadChats(uid) {
-    if (!uid) return [];
-    try {
-      const q = query(collection(db,"users",uid,"chats"), orderBy("updatedAt","desc"), limit(20));
-      const snap = await getDocs(q);
-      return snap.docs.map(d => ({id:d.id,...d.data()}));
-    } catch(e) { return []; }
-  }
+const fb = initializeApp({
+  apiKey:"AIzaSyDa_HS5OEDklgP3naQ9KI7j43gv71aIq4g",
+  authDomain:"devai-studio-1545d.firebaseapp.com",
+  projectId:"devai-studio-1545d",
+  storageBucket:"devai-studio-1545d.firebasestorage.app",
+  messagingSenderId:"66229703752",
+  appId:"1:66229703752:web:161715c1b05854c663747d"
+});
+const db = getFirestore(fb);
+const enc=v=>{try{return btoa(unescape(encodeURIComponent(v)));}catch{return v;}};
+const dec=v=>{try{return decodeURIComponent(escape(atob(v)));}catch{return v;}};
+window.FB={
+  async saveUser(u){if(!u?.uuid)return;try{const r=doc(db,"users",u.uuid),s=await getDoc(r);if(!s.exists())await setDoc(r,{uid:u.uuid,name:u.username||"User",email:u.email||"",createdAt:new Date().toISOString(),lastSeen:new Date().toISOString()});else await updateDoc(r,{lastSeen:new Date().toISOString()});}catch(e){}},
+  async saveTokens(uid,t){if(!uid)return;try{const e={};for(const[k,v]of Object.entries(t))e[k]=v?enc(v):"";await setDoc(doc(db,"users",uid,"private","tokens"),e,{merge:true});}catch(e){}},
+  async loadTokens(uid){if(!uid)return{};try{const s=await getDoc(doc(db,"users",uid,"private","tokens"));if(!s.exists())return{};const r={};for(const[k,v]of Object.entries(s.data()))r[k]=v?dec(v):"";return r;}catch(e){return{};}},
+  async saveSettings(uid,s){if(!uid)return;try{await setDoc(doc(db,"users",uid,"settings","prefs"),s,{merge:true});}catch(e){}},
+  async loadSettings(uid){if(!uid)return null;try{const s=await getDoc(doc(db,"users",uid,"settings","prefs"));return s.exists()?s.data():null;}catch(e){return null;}},
+  async saveChat(uid,cid,msgs){if(!uid)return;try{await setDoc(doc(db,"users",uid,"chats",cid),{messages:msgs,updatedAt:new Date().toISOString()},{merge:true});}catch(e){}}
 };
 </script>
 
-<!-- Puter.js -->
 <script src="https://js.puter.com/v2/"></script>
 
-<!-- MAIN APP -->
 <script>
-// ══════════════════════════════════════
+// ════════════════════════════════════
 // STATE
-// ══════════════════════════════════════
-const S = {
-  user: null,
-  uid: null,
-  model: "claude-3-5-sonnet",
-  modelName: "Claude 3.5 Sonnet",
-  theme: "light",
-  sidebarOpen: false,
-  tokens: { github:"", vercel:"", netlify:"", render:"", railway:"", cloudflare:"", codemagic:"" },
-  github: { username:"", repo:"", branch:"main" },
-  files: {
-    "index.html": "<!DOCTYPE html>\n<html>\n<head>\n  <title>My App</title>\n</head>\n<body>\n  <h1>Hello World!</h1>\n</body>\n</html>",
-    "style.css": "body { font-family: sans-serif; margin: 0; }",
-    "app.js": "console.log('Hello from Dev.ai Studio!');"
-  },
-  activeFile: "index.html",
-  chatHistory: [],
-  chatId: "chat_" + Date.now()
+// ════════════════════════════════════
+const S={
+  user:null, uid:null,
+  model:"claude-3-5-sonnet", modelName:"claude-3-5-sonnet",
+  theme:"light", sidebarOpen:false,
+  tokens:{github:"",vercel:"",netlify:"",render:"",railway:"",cloudflare:"",codemagic:""},
+  github:{username:"",repo:"",branch:"main"},
+  files:{"index.html":"<!DOCTYPE html>\n<html>\n<head><title>My App</title></head>\n<body><h1>Hello!</h1></body>\n</html>","style.css":"body{font-family:sans-serif;margin:0;}","app.js":"console.log('Hello!');"},
+  activeFile:"index.html",
+  chatHistory:[], chatId:"chat_"+Date.now()
 };
+try{const sv=JSON.parse(localStorage.getItem("devai_v4")||"{}");if(sv.tokens)S.tokens={...S.tokens,...sv.tokens};if(sv.github)S.github={...S.github,...sv.github};if(sv.model)S.model=sv.model;if(sv.modelName)S.modelName=sv.modelName;if(sv.files&&Object.keys(sv.files).length)S.files=sv.files;}catch(e){}
+function saveLocal(){localStorage.setItem("devai_v4",JSON.stringify({tokens:S.tokens,github:S.github,model:S.model,modelName:S.modelName,files:S.files}));}
 
-// Load from localStorage
-try {
-  const saved = JSON.parse(localStorage.getItem("devai_v3") || "{}");
-  if (saved.tokens) S.tokens = {...S.tokens, ...saved.tokens};
-  if (saved.github) S.github = {...S.github, ...saved.github};
-  if (saved.model) S.model = saved.model;
-  if (saved.modelName) S.modelName = saved.modelName;
-  if (saved.files && Object.keys(saved.files).length) S.files = saved.files;
-} catch(e) {}
-
-function saveLocal() {
-  localStorage.setItem("devai_v3", JSON.stringify({
-    tokens:S.tokens, github:S.github,
-    model:S.model, modelName:S.modelName, files:S.files
-  }));
-}
-
-// ══════════════════════════════════════
-// THEME
-// ══════════════════════════════════════
-function applyTheme(t) {
-  S.theme = t;
-  document.body.className = "theme-" + t;
-  const icon = document.getElementById("themeIcon");
-  const label = document.getElementById("themeLabel");
-  // Fix logo colors
-  const ghLogo = document.getElementById("logo-github");
-  const vLogo = document.getElementById("logo-vercel");
-  if (t === "dark") {
-    if (icon) icon.textContent = "☀";
-    if (label) label.textContent = "Light Mode";
-    if (ghLogo) ghLogo.style.filter = "invert(1) brightness(0.8)";
-    if (vLogo) vLogo.style.filter = "invert(1) brightness(0.8)";
-  } else {
-    if (icon) icon.textContent = "🌙";
-    if (label) label.textContent = "Dark Mode";
-    if (ghLogo) ghLogo.style.filter = "none";
-    if (vLogo) vLogo.style.filter = "none";
-  }
-  localStorage.setItem("devai_theme", t);
-}
-
-function toggleTheme() {
-  applyTheme(S.theme === "dark" ? "light" : "dark");
-  if (S.uid && window.FB) FB.saveSettings(S.uid, {theme:S.theme});
-}
-
-// ══════════════════════════════════════
-// SIDEBAR
-// ══════════════════════════════════════
-function toggleSidebar() {
-  S.sidebarOpen = !S.sidebarOpen;
-  document.getElementById("sidebar").classList.toggle("closed", !S.sidebarOpen);
-}
-
-function updateBadges() {
-  const svcs = ["github","vercel","netlify","render","railway","cloudflare","codemagic"];
-  svcs.forEach(s => {
-    const el = document.getElementById("badge-" + s);
-    if (!el) return;
-    el.textContent = S.tokens[s] ? "✓" : "—";
-    el.classList.toggle("connected", !!S.tokens[s]);
-  });
-}
-
-// ══════════════════════════════════════
-// AUTH (Puter)
-// ══════════════════════════════════════
-async function handleAuth() {
-  if (typeof puter === "undefined") {
-    showToast("Puter.js load नहीं हुआ!", "error"); return;
-  }
-  try {
-    if (S.user) {
-      await puter.auth.signOut();
-      S.user = null; S.uid = null;
-      updateLoginBtn(false);
-      showToast("Logged out", "success");
-    } else {
-      const user = await puter.auth.signIn();
-      await onLogin(user);
-      showToast("Welcome, " + (user.username || "User") + "! ✓", "success");
-    }
-  } catch(e) {
-    showToast("Auth error: " + e.message, "error");
-  }
-}
-
-async function onLogin(user) {
-  S.user = user;
-  S.uid = user.uuid;
-  updateLoginBtn(true, user);
-
-  if (window.FB) {
-    await FB.saveUser(user);
-    const tokens = await FB.loadTokens(user.uuid);
-    if (tokens) { S.tokens = {...S.tokens, ...tokens}; updateBadges(); }
-    const settings = await FB.loadSettings(user.uuid);
-    if (settings?.theme) applyTheme(settings.theme);
-    if (settings?.model) { S.model = settings.model; S.modelName = settings.modelName || S.modelName; }
-  }
-}
-
-function updateLoginBtn(loggedIn, user) {
-  const btn = document.getElementById("loginBtn");
-  const icon = document.getElementById("loginBtnIcon");
-  const text = document.getElementById("loginBtnText");
-  if (!btn) return;
-  if (loggedIn && user) {
-    btn.className = "topbar-login logged";
-    if (icon) icon.textContent = "✓";
-    if (text) text.textContent = user.username || "Logged In";
-    document.getElementById("modelStatus").textContent = "✓ " + (user.username || "User");
-  } else {
-    btn.className = "topbar-login";
-    if (icon) icon.textContent = "👤";
-    if (text) text.textContent = "Login / Sign Up";
-  }
-}
-
-// ══════════════════════════════════════
-// TOKEN BAR
-// ══════════════════════════════════════
-let _tokenBarOpen = false;
-function toggleTokenBar() {
-  _tokenBarOpen = !_tokenBarOpen;
-  document.getElementById("tokenBar").classList.toggle("show", _tokenBarOpen);
-  if (_tokenBarOpen) document.getElementById("inlineTokenInput").focus();
-}
-function hideTokenBar() {
-  _tokenBarOpen = false;
-  document.getElementById("tokenBar").classList.remove("show");
-}
-function toggleTokenVisibility() {
-  const inp = document.getElementById("inlineTokenInput");
-  const eye = document.getElementById("tokenEye");
-  inp.type = inp.type === "password" ? "text" : "password";
-  eye.textContent = inp.type === "password" ? "👁" : "🙈";
-}
-async function saveInlineToken() {
-  const val = document.getElementById("inlineTokenInput").value.trim();
-  if (!val) return showToast("Token खाली है!", "error");
-  let svc = "github";
-  if (val.startsWith("ghp_") || val.startsWith("github_pat_")) svc = "github";
-  else if (val.startsWith("Bearer ")) svc = "vercel";
-  S.tokens[svc] = val;
-  saveLocal();
-  if (S.uid && window.FB) await FB.saveTokens(S.uid, S.tokens);
-  updateBadges();
-  hideTokenBar();
-  document.getElementById("inlineTokenInput").value = "";
-  showToast("✓ " + svc + " token saved!", "success");
-}
-
-// ══════════════════════════════════════
-// PLUS MENU
-// ══════════════════════════════════════
-let _plusOpen = false;
-function togglePlusMenu() {
-  _plusOpen = !_plusOpen;
-  document.getElementById("plusMenu").classList.toggle("open", _plusOpen);
-}
-function uploadImage() { _plusOpen=false; document.getElementById("plusMenu").classList.remove("open"); document.getElementById("imageInput").click(); }
-function uploadFile() { _plusOpen=false; document.getElementById("plusMenu").classList.remove("open"); document.getElementById("fileInput").click(); }
-function openCamera() { _plusOpen=false; document.getElementById("plusMenu").classList.remove("open"); document.getElementById("cameraInput").click(); }
-function handleImageUpload(input) {
-  const file = input.files?.[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => { window._pendingImg = {data:e.target.result, name:file.name}; showToast("📎 " + file.name + " ready", "success"); };
-  reader.readAsDataURL(file);
-}
-function handleFileUpload(input) {
-  const file = input.files?.[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => { window._pendingFile = {content:e.target.result, name:file.name}; showToast("📎 " + file.name + " ready", "success"); };
-  reader.readAsText(file);
-}
-
-// Close menus on outside click
-document.addEventListener("click", e => {
-  if (!e.target.closest(".model-selector-wrap")) document.getElementById("modelDropdown").classList.remove("open");
-  if (!e.target.closest(".plus-wrap")) { _plusOpen=false; document.getElementById("plusMenu").classList.remove("open"); }
-});
-
-// ══════════════════════════════════════
-// MODELS
-// ══════════════════════════════════════
-const MODELS = {
-  "Top Models": [
-    {id:"claude-3-7-sonnet",name:"Claude 3.7 Sonnet"},
+// ════════════════════════════════════
+// CORRECT PUTER MODEL IDs
+// ════════════════════════════════════
+const MODELS={
+  "🌟 Top":[
+    {id:"claude-sonnet-4-5",name:"Claude Sonnet 4.5"},
     {id:"claude-3-5-sonnet",name:"Claude 3.5 Sonnet"},
     {id:"gpt-4o",name:"GPT-4o"},
-    {id:"gemini-1.5-pro",name:"Gemini 1.5 Pro"},
-    {id:"o1-mini",name:"o1 Mini"},
+    {id:"gpt-4.1",name:"GPT-4.1"},
+    {id:"gemini-2.5-pro",name:"Gemini 2.5 Pro"},
+    {id:"o3-mini",name:"o3 Mini"},
   ],
-  "Fast Models": [
+  "⚡ Fast":[
     {id:"claude-3-5-haiku",name:"Claude 3.5 Haiku"},
     {id:"gpt-4o-mini",name:"GPT-4o Mini"},
+    {id:"gpt-4.1-mini",name:"GPT-4.1 Mini"},
+    {id:"gpt-4.1-nano",name:"GPT-4.1 Nano"},
+    {id:"gemini-2.5-flash",name:"Gemini 2.5 Flash"},
     {id:"gemini-2.0-flash",name:"Gemini 2.0 Flash"},
     {id:"gemini-1.5-flash",name:"Gemini 1.5 Flash"},
   ],
-  "Open Source": [
-    {id:"llama-3.3-70b",name:"Llama 3.3 70B"},
-    {id:"llama-3.1-70b",name:"Llama 3.1 70B"},
-    {id:"llama-3.1-8b",name:"Llama 3.1 8B"},
-    {id:"deepseek-r1",name:"DeepSeek R1"},
-    {id:"deepseek-chat",name:"DeepSeek Chat"},
-    {id:"mixtral-8x7b",name:"Mixtral 8x7B"},
-    {id:"qwen-2.5-72b",name:"Qwen 2.5 72B"},
+  "🌐 Open Source":[
+    {id:"meta-llama/llama-3.3-70b-instruct",name:"Llama 3.3 70B"},
+    {id:"meta-llama/llama-3.1-8b-instruct",name:"Llama 3.1 8B"},
+    {id:"deepseek/deepseek-r1",name:"DeepSeek R1"},
+    {id:"deepseek/deepseek-chat-v3-0324",name:"DeepSeek Chat"},
+    {id:"mistralai/mixtral-8x7b-instruct",name:"Mixtral 8x7B"},
+    {id:"qwen/qwen-2.5-72b-instruct",name:"Qwen 2.5 72B"},
+    {id:"google/gemma-3-27b-it",name:"Gemma 3 27B"},
+    {id:"x-ai/grok-3-mini-beta",name:"Grok 3 Mini"},
   ]
 };
+// Fallback chain — correct IDs
+const FALLBACK=["claude-3-5-sonnet","claude-3-5-haiku","gpt-4o-mini","gpt-4.1-nano","gemini-2.0-flash","meta-llama/llama-3.1-8b-instruct"];
 
-const FALLBACK = ["claude-3-5-sonnet","claude-3-5-haiku","gpt-4o-mini","gemini-1.5-flash","llama-3.1-8b"];
+// ════════════════════════════════════
+// THEME
+// ════════════════════════════════════
+function applyTheme(t){
+  S.theme=t; document.body.className="theme-"+t;
+  const ic=document.getElementById("themeIcon"),lb=document.getElementById("themeLabel");
+  const ghL=document.getElementById("ghLogo"),vL=document.getElementById("vLogo");
+  if(t==="dark"){if(ic)ic.textContent="☀";if(lb)lb.textContent="Light Mode";if(ghL)ghL.style.filter="invert(1) brightness(0.8)";if(vL)vL.style.filter="invert(1) brightness(0.8)";}
+  else{if(ic)ic.textContent="🌙";if(lb)lb.textContent="Dark Mode";if(ghL)ghL.style.filter="none";if(vL)vL.style.filter="none";}
+  localStorage.setItem("devai_theme",t);
+}
+function toggleTheme(){applyTheme(S.theme==="dark"?"light":"dark");if(S.uid&&window.FB)FB.saveSettings(S.uid,{theme:S.theme});}
 
-function initModels() {
-  const dd = document.getElementById("modelDropdown");
-  let html = "";
-  for (const [group, models] of Object.entries(MODELS)) {
-    html += `<div class="model-group-label">${group}</div>`;
-    models.forEach(m => {
-      html += `<div class="model-item${m.id===S.model?" selected":""}" onclick="selectModel('${m.id}','${m.name}')">
-        <span style="flex:1">${m.name}</span>
-        <span class="mi-check">✓</span>
-      </div>`;
-    });
+// ════════════════════════════════════
+// SIDEBAR
+// ════════════════════════════════════
+function toggleSidebar(){S.sidebarOpen=!S.sidebarOpen;document.getElementById("sidebar").classList.toggle("closed",!S.sidebarOpen);document.getElementById("sidebarOverlay").classList.toggle("show",S.sidebarOpen);}
+function closeSidebar(){S.sidebarOpen=false;document.getElementById("sidebar").classList.add("closed");document.getElementById("sidebarOverlay").classList.remove("show");}
+function updateBadges(){["github","vercel","netlify","render","railway","cloudflare","codemagic"].forEach(s=>{const el=document.getElementById("badge-"+s);if(!el)return;el.textContent=S.tokens[s]?"✓":"—";el.classList.toggle("connected",!!S.tokens[s]);});}
+
+// ════════════════════════════════════
+// AUTH
+// ════════════════════════════════════
+async function handleAuth(){
+  if(typeof puter==="undefined"){showToast("Puter.js not loaded","error");return;}
+  try{
+    if(S.user){await puter.auth.signOut();S.user=null;S.uid=null;renderAuthArea(false);showToast("Logged out","success");}
+    else{const u=await puter.auth.signIn();await onLogin(u);showToast("Welcome "+getDisplayName(u)+"! ✓","success");}
+  }catch(e){showToast("Auth: "+e.message,"error");}
+}
+async function onLogin(u){
+  S.user=u;S.uid=u.uuid;renderAuthArea(true,u);
+  if(window.FB){await FB.saveUser(u);const t=await FB.loadTokens(u.uuid);if(t){S.tokens={...S.tokens,...t};updateBadges();}const set=await FB.loadSettings(u.uuid);if(set?.theme)applyTheme(set.theme);if(set?.model){S.model=set.model;S.modelName=set.modelName||set.model;document.getElementById("modelName").textContent=S.modelName;}}
+}
+function getDisplayName(u){return u?.username||u?.email?.split("@")[0]||"User";}
+function getInitials(u){const n=getDisplayName(u);return n.substring(0,2).toUpperCase();}
+function renderAuthArea(loggedIn,u){
+  const area=document.getElementById("authArea");if(!area)return;
+  if(loggedIn&&u){
+    area.innerHTML=`<div class="user-chip" onclick="openSettings('general')"><div class="user-avatar">${getInitials(u)}</div><span class="user-name">${getDisplayName(u)}</span></div>`;
+    document.getElementById("modelStatus").textContent="✓ "+getDisplayName(u);
+  }else{
+    area.innerHTML=`<button class="topbar-login" onclick="handleAuth()"><span>👤</span> Login</button>`;
+    document.getElementById("modelStatus").textContent="Ready";
   }
-  dd.innerHTML = html;
-  document.getElementById("modelName").textContent = S.modelName;
 }
 
-function toggleModelDropdown() {
-  document.getElementById("modelDropdown").classList.toggle("open");
-}
-
-function selectModel(id, name) {
-  S.model = id; S.modelName = name;
-  document.getElementById("modelName").textContent = name;
-  document.getElementById("modelDropdown").classList.remove("open");
-  document.querySelectorAll(".model-item").forEach(el => el.classList.toggle("selected", el.textContent.trim().startsWith(name)));
-  saveLocal();
-  if (S.uid && window.FB) FB.saveSettings(S.uid, {theme:S.theme, model:id, modelName:name});
-}
-
-// ══════════════════════════════════════
-// AI CALL (with fallback chain)
-// ══════════════════════════════════════
-async function callAI(prompt, imgData) {
-  if (typeof puter === "undefined") throw new Error("Puter.js not loaded");
-  const chain = [S.model, ...FALLBACK.filter(m => m !== S.model)];
-  const tried = new Set();
-  for (const m of chain) {
-    if (tried.has(m)) continue;
-    tried.add(m);
-    try {
-      let res;
-      if (imgData) {
-        res = await puter.ai.chat([{role:"user",content:[
-          {type:"image_url",image_url:{url:imgData}},
-          {type:"text",text:prompt}
-        ]}], {model:m});
-      } else {
-        res = await puter.ai.chat(prompt, {model:m});
-      }
-      const text = typeof res==="string" ? res : res?.message?.content?.[0]?.text || res?.message?.content || JSON.stringify(res);
-      if (text) { termLog("✓ Model used: "+m, "success"); return text; }
-    } catch(e) {
-      termLog("Model "+m+" failed, trying next...", "warn");
-    }
-  }
-  throw new Error("All AI models unavailable");
-}
-
-// ══════════════════════════════════════
-// CHAT
-// ══════════════════════════════════════
-const mainInput = document.getElementById("mainInput");
-mainInput.addEventListener("input", function() {
-  this.style.height = "auto";
-  this.style.height = Math.min(this.scrollHeight, 160) + "px";
-});
-mainInput.addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-});
-
-function newChat() {
-  S.chatHistory = [];
-  S.chatId = "chat_" + Date.now();
-  document.getElementById("messages").innerHTML = "";
-  document.getElementById("messages").style.display = "none";
-  document.getElementById("welcomeScreen").style.display = "flex";
-  window._pendingImg = null; window._pendingFile = null;
-}
-
-function suggest(text) {
-  document.getElementById("mainInput").value = text;
-  sendMessage();
-}
-
-function initSuggestions() {
-  const el = document.getElementById("suggestions");
-  const items = [
-    {icon:"🛒",title:"E-commerce App",sub:"React + CSS, full project",prompt:"एक complete ecommerce website बनाओ React में"},
-    {icon:"📱",title:"Mobile App UI",sub:"Responsive design",prompt:"एक mobile app का UI बनाओ"},
-    {icon:"🐙",title:"GitHub Push",sub:"Files push to repo",prompt:"मेरा code GitHub पर push करो"},
-    {icon:"🚀",title:"Deploy App",sub:"Vercel / Netlify",prompt:"मेरी app Vercel पर deploy करो"},
-    {icon:"🔧",title:"Fix My Code",sub:"Debug & improve",prompt:"मेरे code को fix करो"},
-    {icon:"📦",title:"Build APK",sub:"Android via Codemagic",prompt:"मेरे project का APK build करो"},
-  ];
-  el.innerHTML = items.map(i =>
-    `<div class="suggestion" onclick="suggest('${i.prompt.replace(/'/g,"\\'")}')">
-      <div class="suggestion-icon">${i.icon}</div>
-      <div class="suggestion-title">${i.title}</div>
-      <div class="suggestion-sub">${i.sub}</div>
-    </div>`
-  ).join("");
-}
-
-async function sendMessage() {
-  const text = mainInput.value.trim();
-  if (!text) return;
-  mainInput.value = ""; mainInput.style.height = "auto";
-
-  document.getElementById("welcomeScreen").style.display = "none";
-  const msgs = document.getElementById("messages");
-  msgs.style.display = "flex";
-
-  const img = window._pendingImg;
-  const file = window._pendingFile;
-  window._pendingImg = null; window._pendingFile = null;
-
-  addUserMsg(text, img);
-  S.chatHistory.push({role:"user", content:text});
-
-  const thinking = addThinking();
-  document.getElementById("sendBtn").disabled = true;
-
-  try {
-    const lower = text.toLowerCase();
-    const needGH = lower.includes("github")||lower.includes("push")||lower.includes("commit");
-    const needDeploy = lower.includes("deploy")||lower.includes("vercel")||lower.includes("netlify");
-    const needAPK = lower.includes("apk")||lower.includes("codemagic");
-    const needToken = lower.includes("token")||lower.includes("add")||lower.includes("connect");
-
-    // Token popup request
-    if (needToken && (lower.includes("token")||lower.includes("api key"))) {
-      thinking.remove();
-      showTokenPopupInChat();
-      document.getElementById("sendBtn").disabled = false;
-      return;
-    }
-
-    if (needGH && !S.tokens.github) { thinking.remove(); addAIMsg(missingTokenMsg("github")); document.getElementById("sendBtn").disabled=false; return; }
-    if (needDeploy && !S.tokens.vercel && !S.tokens.netlify) { thinking.remove(); addAIMsg(missingTokenMsg("deploy")); document.getElementById("sendBtn").disabled=false; return; }
-    if (needAPK && !S.tokens.codemagic) { thinking.remove(); addAIMsg(missingTokenMsg("codemagic")); document.getElementById("sendBtn").disabled=false; return; }
-
-    let sysPrompt = `You are Dev.ai Studio, an expert AI coding assistant.
-User: ${S.user?.username||"Developer"}
-Connected: ${Object.entries(S.tokens).filter(([k,v])=>v).map(([k])=>k).join(",")||"none"}
-Files: ${Object.keys(S.files).join(", ")}
-When generating code files use format:
-// File: filename.ext
-\`\`\`lang
-code
-\`\`\`
-Respond in Hindi/English mix. Be helpful and action-oriented.`;
-
-    if (file) sysPrompt += `\n\nAttached file (${file.name}):\n\`\`\`\n${file.content.substring(0,2000)}\n\`\`\``;
-
-    const full = sysPrompt + "\n\nUser: " + text;
-    const reply = await callAI(full, img?.data || null);
-
-    thinking.remove();
-    extractFiles(reply);
-    addAIMsg(reply);
-    S.chatHistory.push({role:"assistant", content:reply});
-
-    if (S.uid && window.FB) FB.saveChatHistory(S.uid, S.chatId, S.chatHistory);
-    addToHistory(text);
-
-  } catch(e) {
-    thinking.remove();
-    addAIMsg("❌ Error: " + e.message);
-  }
-  document.getElementById("sendBtn").disabled = false;
-}
-
-function missingTokenMsg(type) {
-  const m = {
-    github:`🐙 **GitHub token नहीं है!**\n\n**Quick:** 🔑 button → Token paste → Save\n**Settings:** ☰ → GitHub → Token add करो\n\n**Token:** github.com → Settings → Developer Settings → Personal Access Tokens`,
-    deploy:`🚀 **Deploy token नहीं है!**\n\nSettings में add करो:\n• ☰ → Vercel\n• ☰ → Netlify\n• ☰ → Render / Railway`,
-    codemagic:`🪄 **Codemagic token नहीं है!**\n\n☰ → Codemagic → API Key add करो`
-  };
-  return m[type] || "Please connect required service in Settings.";
-}
-
-function extractFiles(text) {
-  const re = /\/\/\s*File:\s*([\w.\-/]+)\s*\n```(?:\w+)?\n([\s\S]*?)```/gi;
-  let m; let n=0;
-  while ((m=re.exec(text))!==null) {
-    S.files[m[1].trim()] = m[2].trim(); n++;
-  }
-  if (n>0) { saveLocal(); showToast("✓ "+n+" file(s) created!", "success"); }
-}
-
-function addUserMsg(text, img) {
-  const msgs = document.getElementById("messages");
-  const row = document.createElement("div");
-  row.className = "msg-row user";
-  row.innerHTML = `<div class="msg-avatar">👤</div>
-    <div class="msg-body">
-      <div class="msg-name">YOU</div>
-      <div class="msg-bubble">
-        ${img?`<img src="${img.data}" class="msg-image" alt="img">`:""} 
-        ${esc(text).replace(/\n/g,"<br>")}
-      </div>
-    </div>`;
-  msgs.appendChild(row);
-  scrollChat();
-}
-
-function addThinking() {
-  const msgs = document.getElementById("messages");
-  const row = document.createElement("div");
-  row.className = "msg-row ai";
-  row.innerHTML = `<div class="msg-avatar">⚡</div>
-    <div class="msg-body"><div class="msg-name">DEV.AI</div>
-    <div class="msg-bubble"><div class="thinking-wrap">
-      <div class="thinking-dot"></div><div class="thinking-dot"></div><div class="thinking-dot"></div>
-    </div></div></div>`;
-  msgs.appendChild(row); scrollChat();
-  return row;
-}
-
-function addAIMsg(text) {
-  const msgs = document.getElementById("messages");
-  const row = document.createElement("div");
-  row.className = "msg-row ai";
-  const bubble = document.createElement("div");
-  bubble.className = "msg-bubble";
-  bubble.innerHTML = fmt(text);
-
-  // Action buttons
-  const lower = text.toLowerCase();
-  const btns = [];
-  if (text.includes("```") || Object.keys(S.files).length > 3) btns.push({label:"⌨ Editor खोलो", fn:()=>openEditor()});
-  if (lower.includes("github")||text.includes("```")) btns.push({label:"🐙 GitHub Push", primary:true, fn:()=>doPushToGithub()});
-  if (lower.includes("deploy")||lower.includes("vercel")) btns.push({label:"🚀 Deploy", fn:()=>openDeployOptions()});
-
-  if (btns.length) {
-    const div = document.createElement("div"); div.className="msg-actions"; div.style.marginTop="10px";
-    btns.forEach(b => { const btn=document.createElement("button"); btn.className="msg-action-btn"+(b.primary?" primary":""); btn.textContent=b.label; btn.onclick=b.fn; div.appendChild(btn); });
-    bubble.appendChild(div);
-  }
-
-  row.innerHTML = `<div class="msg-avatar">⚡</div><div class="msg-body"><div class="msg-name">DEV.AI</div></div>`;
-  row.querySelector(".msg-body").appendChild(bubble);
-  msgs.appendChild(row); scrollChat();
-}
-
-function addToHistory(text) {
-  const list = document.getElementById("historyList");
-  const empty = list.querySelector(".history-empty");
-  if (empty) empty.remove();
-  const item = document.createElement("div");
-  item.className = "history-item";
-  item.textContent = text.substring(0,35) + (text.length>35?"...":"");
-  list.insertBefore(item, list.firstChild);
-  if (list.children.length > 15) list.lastChild.remove();
-}
-
-function fmt(t) {
-  t = t.replace(/```(\w+)?\n?([\s\S]*?)```/g,(_,l,c)=>`<div class="code-block-header"><span>${l||"code"}</span><button class="code-copy-btn" onclick="copyCode(this)">Copy</button></div><pre><code>${esc(c.trim())}</code></pre>`);
-  t = t.replace(/`([^`]+)`/g,"<code>$1</code>");
-  t = t.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
-  t = t.replace(/\*([^*]+)\*/g,"<em>$1</em>");
-  t = t.replace(/^- (.+)$/gm,"<li style='margin:2px 0'>$1</li>");
-  t = t.replace(/\n/g,"<br>");
-  return t;
-}
-function esc(t) { return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-function scrollChat() { const a=document.getElementById("chatArea"); if(a) a.scrollTop=a.scrollHeight; }
-function copyCode(btn) { const c=btn.closest(".msg-bubble")?.querySelector("code"); if(c) navigator.clipboard.writeText(c.textContent).then(()=>showToast("Copied!","success")); }
-
-// ══════════════════════════════════════
-// TOKEN POPUP IN CHAT
-// ══════════════════════════════════════
-function showTokenPopupInChat(svc) {
-  const svcs = [{id:"github",label:"GitHub"},{id:"vercel",label:"Vercel"},{id:"netlify",label:"Netlify"},{id:"render",label:"Render"},{id:"railway",label:"Railway"},{id:"cloudflare",label:"Cloudflare"},{id:"codemagic",label:"Codemagic"}];
-  window._ctpSvc = svc || "github";
-  const msgs = document.getElementById("messages");
-  msgs.style.display = "flex";
-  document.getElementById("welcomeScreen").style.display = "none";
-  const row = document.createElement("div");
-  row.className = "msg-row ai"; row.id = "ctpRow";
-  row.innerHTML = `<div class="msg-avatar">⚡</div>
-    <div class="msg-body" style="max-width:95%">
-      <div class="msg-name">DEV.AI</div>
-      <div class="msg-bubble" style="padding:16px">
-        <div style="font-weight:600;margin-bottom:4px">🔑 Token Add करो</div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Service select करो और token paste करो:</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
-          ${svcs.map(s=>`<div style="padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:${s.id===window._ctpSvc?"var(--accent-glow)":"var(--surface2)"};color:${s.id===window._ctpSvc?"var(--accent)":"var(--text2)"}" onclick="ctpSvc('${s.id}',this)">${s.label}</div>`).join("")}
-        </div>
-        <div style="display:flex;gap:6px;margin-bottom:10px">
-          <input id="ctpInp" type="password" placeholder="Token paste करो..." style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 10px;font-family:'DM Mono',monospace;font-size:12px;outline:none;">
-          <button onclick="ctpEye()" style="width:36px;height:36px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);cursor:pointer" id="ctpEyeBtn">👁</button>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="msg-action-btn primary" onclick="ctpSave()">✓ Save Token</button>
-          <button class="msg-action-btn" onclick="document.getElementById('ctpRow')?.remove()">Cancel</button>
-        </div>
-      </div>
-    </div>`;
-  msgs.appendChild(row); scrollChat();
-  setTimeout(()=>document.getElementById("ctpInp")?.focus(),100);
-}
-function ctpSvc(s,el) { window._ctpSvc=s; document.querySelectorAll("#ctpRow [onclick^='ctpSvc']").forEach(e=>{e.style.background="var(--surface2)";e.style.color="var(--text2)"}); el.style.background="var(--accent-glow)"; el.style.color="var(--accent)"; }
-function ctpEye() { const i=document.getElementById("ctpInp"),b=document.getElementById("ctpEyeBtn"); if(!i)return; i.type=i.type==="password"?"text":"password"; b.textContent=i.type==="password"?"👁":"🙈"; }
-async function ctpSave() {
-  const val=document.getElementById("ctpInp")?.value.trim(); if(!val){showToast("Token खाली है!","error");return;}
-  S.tokens[window._ctpSvc]=val; saveLocal();
-  if(S.uid&&window.FB) await FB.saveTokens(S.uid,S.tokens);
-  updateBadges(); document.getElementById("ctpRow")?.remove();
-  addAIMsg("✅ **"+window._ctpSvc+" token saved!**\n\nअब आप "+window._ctpSvc+" operations कर सकते हो।");
-}
-
-// ══════════════════════════════════════
-// GITHUB
-// ══════════════════════════════════════
-async function doPushToGithub() {
-  if (!S.tokens.github) { showToast("GitHub token नहीं है!","error"); openSettings("github"); return; }
-  if (!S.github.username||!S.github.repo) { showToast("GitHub username/repo add करो!","error"); openSettings("github"); return; }
-  const {username,repo,branch} = S.github;
-  termLog("🐙 Pushing to "+username+"/"+repo+"...", "info");
-  showToast("Pushing...");
-  const ed = document.getElementById("codeEditor");
-  if (ed) S.files[S.activeFile] = ed.value;
-  let ok=0,fail=0;
-  for (const [fname,content] of Object.entries(S.files)) {
-    try {
-      let sha=null;
-      try { const r=await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${fname}`,{headers:{Authorization:`token ${S.tokens.github}`}}); if(r.ok){const d=await r.json();sha=d.sha;} } catch(_){}
-      const body={message:"update from Dev.ai Studio",content:btoa(unescape(encodeURIComponent(content))),branch};
-      if(sha) body.sha=sha;
-      const r=await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${fname}`,{method:"PUT",headers:{Authorization:`token ${S.tokens.github}`,"Content-Type":"application/json"},body:JSON.stringify(body)});
-      if(r.ok){ok++;termLog("  ✓ "+fname,"success");}else{fail++;const e=await r.json();termLog("  ✗ "+fname+": "+e.message,"error");}
-    } catch(e){fail++;termLog("  ✗ "+fname+": "+e.message,"error");}
-  }
-  if(ok>0){showToast("✓ "+ok+" files pushed!","success");addAIMsg("✅ **"+ok+" files** pushed to **"+username+"/"+repo+"**!\n\n🔗 https://github.com/"+username+"/"+repo);}
-  else{showToast("Push failed!","error");}
-}
-
-// ══════════════════════════════════════
-// DEPLOY OPTIONS
-// ══════════════════════════════════════
-function openDeployOptions() {
-  const connected = Object.entries(S.tokens).filter(([k,v])=>["vercel","netlify","render","railway","cloudflare"].includes(k)&&v).map(([k])=>k);
-  if(!connected.length){addAIMsg("🚀 **Deploy service connect नहीं है!**\n\n☰ → Settings → Vercel / Netlify / Render add करो");return;}
-  addAIMsg("🚀 **Deploy करो — कहाँ?**\n\nNeeche service select करो:");
-  const msgs=document.getElementById("messages");
-  const row=document.createElement("div"); row.className="msg-row ai";
-  row.innerHTML=`<div class="msg-avatar">⚡</div><div class="msg-body"><div class="msg-name">DEV.AI</div><div class="msg-bubble"><div class="msg-actions">${connected.map(s=>`<button class="msg-action-btn primary" onclick="deployTo('${s}')">Deploy to ${s}</button>`).join("")}</div></div></div>`;
-  msgs.appendChild(row); scrollChat();
-}
-
-async function deployTo(svc) {
-  if(svc==="vercel") await deployVercel();
-  else addAIMsg(`🚀 **${svc} Deploy:**\n\n1. GitHub पर code push करो\n2. ${svc}.com/app.${svc}.com पर जाकर repo connect करो\n3. Automatic deploy होगा!`);
-}
-
-async function deployVercel() {
-  const token=S.tokens.vercel;
-  if(!token){showToast("Vercel token नहीं है!","error");return;}
-  const ed=document.getElementById("codeEditor"); if(ed) S.files[S.activeFile]=ed.value;
-  try {
-    const res=await fetch("https://api.vercel.com/v13/deployments",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({name:S.github.repo||"devai-project",files:Object.entries(S.files).map(([f,d])=>({file:f,data:d})),projectSettings:{framework:null}})});
-    const data=await res.json();
-    if(res.ok&&data.url){const url="https://"+data.url;showToast("✓ Deployed: "+url,"success");addAIMsg("✅ **Vercel Deploy हो गया!**\n\n🔗 "+url);}
-    else throw new Error(data.error?.message||"Deploy failed");
-  }catch(e){showToast("Vercel error: "+e.message,"error");}
-}
-
-// ══════════════════════════════════════
-// CODE EDITOR
-// ══════════════════════════════════════
-function openEditor() {
-  renderEditorTabs(); updateEditorContent(); openPanel("editorPanel"); setupEditor();
-}
-function renderEditorTabs() {
-  const bar=document.getElementById("editorTabsBar"); if(!bar)return;
-  bar.innerHTML=Object.keys(S.files).map(f=>`<div class="etab${f===S.activeFile?" active":""}" onclick="switchTab('${f}')">${getIcon(f)} ${f}<span class="etab-close" onclick="delTab('${f}',event)">×</span></div>`).join("")+`<div class="etab-new" onclick="newEdFile()">＋</div>`;
-}
-function getIcon(n){if(n.endsWith(".html"))return"🌐";if(n.endsWith(".css"))return"🎨";if(n.endsWith(".js")||n.endsWith(".jsx"))return"📜";if(n.endsWith(".ts")||n.endsWith(".tsx"))return"🔷";if(n.endsWith(".py"))return"🐍";if(n.endsWith(".json"))return"{}";return"📄";}
-function updateEditorContent(){const ed=document.getElementById("codeEditor");if(!ed)return;ed.value=S.files[S.activeFile]||"";updateLineNums();updateEdStatus();}
-function updateLineNums(){const ed=document.getElementById("codeEditor"),nums=document.getElementById("lineNums");if(!ed||!nums)return;const n=(ed.value.match(/\n/g)||[]).length+1;nums.innerHTML=Array.from({length:n},(_,i)=>i+1).join("<br>");}
-function updateEdStatus(){const ed=document.getElementById("codeEditor");if(!ed)return;const ls=ed.value.substr(0,ed.selectionStart).split("\n");const cur=document.getElementById("editorCursor");const lang=document.getElementById("editorLang");if(cur)cur.textContent=`Ln ${ls.length}, Col ${ls[ls.length-1].length+1}`;if(lang){const ext=S.activeFile.split(".").pop();const m={js:"JavaScript",jsx:"React JSX",html:"HTML",css:"CSS",py:"Python",json:"JSON",ts:"TypeScript"};lang.textContent=m[ext]||ext.toUpperCase();}}
-function switchTab(f){const ed=document.getElementById("codeEditor");if(ed)S.files[S.activeFile]=ed.value;S.activeFile=f;renderEditorTabs();updateEditorContent();}
-function delTab(f,e){e.stopPropagation();if(Object.keys(S.files).length<=1){showToast("Last file delete नहीं!","error");return;}delete S.files[f];if(S.activeFile===f)S.activeFile=Object.keys(S.files)[0];renderEditorTabs();updateEditorContent();}
-function newEdFile(){const n=prompt("File name:");if(!n?.trim())return;S.files[n.trim()]="";S.activeFile=n.trim();renderEditorTabs();updateEditorContent();}
-function saveAllFiles(){const ed=document.getElementById("codeEditor");if(ed)S.files[S.activeFile]=ed.value;saveLocal();showToast("✓ Saved!","success");}
-let _edSetup=false;
-function setupEditor(){
-  const ed=document.getElementById("codeEditor"); if(!ed||_edSetup)return; _edSetup=true;
-  ed.addEventListener("input",()=>{S.files[S.activeFile]=ed.value;updateLineNums();});
-  ed.addEventListener("keydown",e=>{if(e.key==="Tab"){e.preventDefault();const s=ed.selectionStart;ed.value=ed.value.substring(0,s)+"  "+ed.value.substring(ed.selectionEnd);ed.selectionStart=ed.selectionEnd=s+2;}if(e.ctrlKey&&e.key==="s"){e.preventDefault();saveAllFiles();}});
-  ed.addEventListener("keyup",updateEdStatus); ed.addEventListener("click",updateEdStatus);
-  ed.addEventListener("scroll",()=>{const n=document.getElementById("lineNums");if(n)n.scrollTop=ed.scrollTop;});
-}
-
-// ══════════════════════════════════════
-// SETTINGS
-// ══════════════════════════════════════
-function openSettings(sec) {
-  renderSettings(sec||"general");
-  openPanel("settingsPanel");
-}
-
-function renderSettings(sec) {
-  const body=document.getElementById("settingsBody"); if(!body)return;
-  const navs=["general","github","vercel","netlify","render","railway","cloudflare","codemagic"];
-  const navLabels={general:"⚙ General",github:"🐙 GitHub",vercel:"▲ Vercel",netlify:"◆ Netlify",render:"🟣 Render",railway:"🚂 Railway",cloudflare:"☁ CF",codemagic:"🪄 APK"};
-  body.innerHTML=`<div class="settings-nav">${navs.map(n=>`<div class="snav-item${n===sec?" active":""}" onclick="renderSettings('${n}')">${navLabels[n]}</div>`).join("")}</div>${renderSecContent(sec)}`;
-}
-
-function renderSecContent(s) {
-  if(s==="general") return `
-    <div class="settings-section">
-      <div class="settings-section-title">Account</div>
-      <div class="settings-card">
-        <div class="settings-card-header">
-          <div class="settings-card-title">${S.user?"👤 "+S.user.username:"Not logged in"}</div>
-          <button class="${S.user?"modal-btn danger":"modal-btn primary"}" onclick="handleAuth()">${S.user?"Logout":"Login with Puter"}</button>
-        </div>
-        <div class="settings-card-desc">Puter.js — एक login से AI, storage सब free।</div>
-      </div>
-    </div>
-    <div class="settings-section">
-      <div class="settings-section-title">Theme</div>
-      <div class="settings-card">
-        <div class="settings-card-header">
-          <div class="settings-card-title">Current: ${S.theme==="dark"?"🌙 Dark":"☀ Light"}</div>
-          <button class="modal-btn primary" onclick="toggleTheme()">Switch</button>
-        </div>
-      </div>
-    </div>`;
-
-  const info = {
-    github:{name:"GitHub",help:"github.com → Settings → Developer Settings → Personal Access Tokens → repo scope",ph:"ghp_xxxxxxxxxxxxxxxxxxxx",
-      extra:`<div class="settings-card" style="margin-top:10px">
-        <div class="settings-section-title">Repo Details</div>
-        <div class="modal-label">USERNAME</div><input class="s-input" id="si_ghuser" placeholder="yourusername" value="${S.github.username}">
-        <div class="modal-label" style="margin-top:8px">REPO</div><input class="s-input" id="si_ghrepo" placeholder="my-project" value="${S.github.repo}">
-        <div class="modal-label" style="margin-top:8px">BRANCH</div><input class="s-input" id="si_ghbranch" placeholder="main" value="${S.github.branch}">
-        <button class="s-save" style="margin-top:10px" onclick="saveGHDetails()">Save Details</button>
-      </div>`},
-    vercel:{name:"Vercel",help:"vercel.com → Settings → Tokens → Create",ph:"Bearer xxxxxxxxxxxxxxxx"},
-    netlify:{name:"Netlify",help:"app.netlify.com → User Settings → Applications → New access token",ph:"xxxxxxxxxxxxxxxxxxxxxxxxx"},
-    render:{name:"Render",help:"dashboard.render.com → Account Settings → API Keys",ph:"rnd_xxxxxxxxxxxxxx"},
-    railway:{name:"Railway",help:"railway.app → Account Settings → Tokens",ph:"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"},
-    cloudflare:{name:"Cloudflare Pages",help:"dash.cloudflare.com → My Profile → API Tokens → Create",ph:"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"},
-    codemagic:{name:"Codemagic (APK)",help:"codemagic.io → Teams → Integrations → API Keys",ph:"CM API Key"},
-  };
-  const d=info[s]; if(!d)return"";
-  const connected=!!S.tokens[s];
-  return `<div class="settings-section">
-    <div class="settings-section-title">${d.name}</div>
-    <div class="settings-card">
-      <div class="settings-card-header">
-        <div class="settings-card-title">API Token</div>
-        <span class="${connected?"connected-badge":"disconnected-badge"}">${connected?"✓ Connected":"✗ Not Set"}</span>
-      </div>
-      <div class="settings-card-desc">${d.help}</div>
-      <div class="s-input-row">
-        <input class="s-input" id="si_${s}" type="password" placeholder="${d.ph}" value="${S.tokens[s]}" style="flex:1">
-        <button class="s-eye" onclick="toggleSI('si_${s}',this)">👁</button>
-        <button class="s-save" onclick="saveSI('${s}','si_${s}')">Save</button>
-      </div>
-    </div>
-    ${d.extra||""}
-  </div>`;
-}
-
-function toggleSI(id,btn){const i=document.getElementById(id);if(!i)return;i.type=i.type==="password"?"text":"password";btn.textContent=i.type==="password"?"👁":"🙈";}
-async function saveSI(key,id){const val=document.getElementById(id)?.value.trim()||"";S.tokens[key]=val;saveLocal();if(S.uid&&window.FB)await FB.saveTokens(S.uid,S.tokens);updateBadges();showToast("✓ "+key+" token saved!","success");renderSettings(key);}
-function saveGHDetails(){S.github.username=document.getElementById("si_ghuser")?.value.trim()||"";S.github.repo=document.getElementById("si_ghrepo")?.value.trim()||"";S.github.branch=document.getElementById("si_ghbranch")?.value.trim()||"main";saveLocal();showToast("✓ GitHub details saved!","success");}
-
-// ══════════════════════════════════════
-// PANELS
-// ══════════════════════════════════════
-function openPanel(id){closePanel(false);document.getElementById("panelOverlay").classList.add("open");document.getElementById(id).classList.add("open");}
-function closePanel(save=true){document.getElementById("panelOverlay").classList.remove("open");document.querySelectorAll(".panel").forEach(p=>p.classList.remove("open"));if(save){const ed=document.getElementById("codeEditor");if(ed)S.files[S.activeFile]=ed.value;saveLocal();}}
-function openTerminalPanel(){openPanel("terminalPanel");}
-
-// ══════════════════════════════════════
-// TERMINAL
-// ══════════════════════════════════════
-function termLog(msg,type=""){const t=document.getElementById("terminalBody");if(!t)return;const c={info:"var(--accent)",success:"var(--green)",warn:"var(--yellow)",error:"var(--red)"};t.innerHTML+=`<span style="color:${c[type]||"#a3e635"}">${msg}</span><br>`;t.scrollTop=t.scrollHeight;}
-
-// ══════════════════════════════════════
-// TOAST
-// ══════════════════════════════════════
-function showToast(msg,type=""){const t=document.getElementById("toast");if(!t)return;t.textContent=msg;t.className="toast show "+type;clearTimeout(window._tt);window._tt=setTimeout(()=>t.className="toast",2800);}
-
-// ══════════════════════════════════════
-// INIT
-// ══════════════════════════════════════
-document.addEventListener("DOMContentLoaded", async () => {
-  // Theme
-  const savedTheme = localStorage.getItem("devai_theme") || "light";
-  applyTheme(savedTheme);
-
-  // Models
-  initModels();
-
-  // Suggestions
-  initSuggestions();
-
-  // Puter init
-  const statusEl = document.getElementById("modelStatus");
-  try {
-    // Wait for puter
-    await new Promise(r => { if(typeof puter!=="undefined") r(); else window.addEventListener("load",r); });
-    if (typeof puter !== "undefined") {
-      if(statusEl) statusEl.textContent = "Puter.js Ready ✓";
-      const isIn = await puter.auth.isSignedIn().catch(()=>false);
-      if (isIn) {
-        const user = await puter.auth.getUser().catch(()=>null);
-        if (user) await onLogin(user);
-      }
-    }
-  } catch(e) {
-    if(statusEl) statusEl.textContent = "Ready";
-  }
-
-  updateBadges();
-});
-</script>
-</body>
-</html>
+// ════════════════════════════════════
+// TOKEN BAR
+// ════════════════════════════════════
+let _tb=false;
+function toggleTokenBa
