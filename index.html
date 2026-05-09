@@ -2,406 +2,411 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Dev.ai Studio</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/variables.css">
-<link rel="stylesheet" href="css/main.css">
-<link rel="stylesheet" href="css/sidebar.css">
-<link rel="stylesheet" href="css/chat.css">
-<link rel="stylesheet" href="css/modals.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ── MOBILE FIXES ── */
-* { -webkit-tap-highlight-color: transparent; }
-
-.topbar { padding: 0 12px; gap: 8px; }
-.topbar-login {
-  display: flex; align-items: center; gap: 6px;
-  padding: 6px 12px; border-radius: 20px;
-  background: var(--accent); border: none;
-  color: #fff; font-family: 'DM Sans', sans-serif;
-  font-size: 12px; font-weight: 600; cursor: pointer;
-  transition: all 0.15s; white-space: nowrap;
-}
-.topbar-login:hover { background: var(--accent2); }
-.topbar-login.logged {
-  background: var(--surface2); color: var(--text);
-  border: 1px solid var(--border);
-}
-
-.user-chip {
-  display: flex; align-items: center; gap: 7px;
-  padding: 4px 10px 4px 4px; border-radius: 20px;
-  background: var(--surface2); border: 1px solid var(--border);
-  cursor: pointer; transition: all 0.15s;
-}
-.user-chip:hover { border-color: var(--red); }
-.user-avatar {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: var(--accent); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; flex-shrink: 0;
-}
-.user-name { font-size: 12px; font-weight: 600; color: var(--text); max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* Mic button */
-.mic-btn {
-  width: 32px; height: 32px; border-radius: 8px;
-  background: none; border: 1px solid var(--border);
-  color: var(--text2); cursor: pointer; font-size: 15px;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.12s; flex-shrink: 0;
-}
-.mic-btn:hover { color: var(--text); border-color: var(--border2); }
-.mic-btn.recording { background: rgba(239,68,68,0.1); border-color: var(--red); color: var(--red); animation: pulse 1s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-
-/* Mobile responsive */
-@media (max-width: 600px) {
-  .sidebar { width: 85vw; }
-  .panel, .panel.panel-wide { width: 100vw !important; }
-  .suggestions { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .suggestion { padding: 10px 12px; }
-  .welcome h1 { font-size: 22px; }
-  .welcome p { font-size: 13px; }
-  .model-selector span:not(.model-dot) { display: none; }
-  .model-selector { padding: 6px 8px; }
-  .topbar { height: 48px; }
-  .msg-body { max-width: 88%; }
-  .messages { padding: 12px 14px; }
-}
-
-/* Sidebar overlay for mobile */
-.sidebar-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.4); z-index: 49;
-}
-.sidebar-overlay.show { display: block; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;font-family:'DM Sans',sans-serif;}
+body{--bg:#fff;--bg2:#f8f9fa;--sur:#f1f3f5;--sur2:#e9ecef;--bor:#e2e6ea;--bor2:#ced4da;--tx:#1a1a2e;--tx2:#6c757d;--tx3:#adb5bd;--acc:#2563eb;--acc2:#1d4ed8;--glow:rgba(37,99,235,0.08);--grn:#16a34a;--red:#dc2626;--ylw:#d97706;--shd:rgba(0,0,0,0.06);--cbg:#1e1e2e;background:var(--bg);color:var(--tx);overflow:hidden;display:flex;}
+body.dark{--bg:#0d0d0d;--bg2:#111;--sur:#161616;--sur2:#1e1e1e;--bor:#2a2a2a;--bor2:#333;--tx:#ececec;--tx2:#888;--tx3:#555;--acc:#38bdf8;--acc2:#0ea5e9;--glow:rgba(56,189,248,0.1);--grn:#3dd68c;--red:#ff5f5f;--ylw:#f5a623;--shd:rgba(0,0,0,0.4);--cbg:#0a0a0a;}
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-thumb{background:var(--bor2);border-radius:2px;}
+#app{display:flex;height:100vh;width:100%;overflow:hidden;position:relative;}
+#sbBg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:59;}
+#sbBg.show{display:block;}
+#sb{width:268px;background:var(--sur);border-right:1px solid var(--bor);display:flex;flex-direction:column;position:absolute;top:0;bottom:0;left:0;z-index:60;transform:translateX(-268px);transition:transform .25s ease;}
+#sb.open{transform:translateX(0);}
+.sb-hd{padding:15px 14px 12px;border-bottom:1px solid var(--bor);}
+.logo{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:600;color:var(--tx);margin-bottom:11px;}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc);}
+.new-btn{width:100%;padding:8px 12px;border-radius:8px;background:var(--sur2);border:1px solid var(--bor);color:var(--tx2);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .15s;}
+.new-btn:hover{background:var(--bor);color:var(--tx);}
+.sb-sc{flex:1;overflow-y:auto;padding:6px 8px;}
+.sb-lbl{font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:.8px;text-transform:uppercase;padding:10px 8px 5px;}
+.si{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--tx2);transition:all .12s;}
+.si:hover{background:var(--sur2);color:var(--tx);}
+.si img{width:15px;height:15px;object-fit:contain;flex-shrink:0;}
+.si .ic{width:17px;text-align:center;font-size:14px;flex-shrink:0;}
+.si .tx{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.si .bx{font-size:11px;font-weight:600;color:var(--tx3);}
+.si .bx.on{color:var(--grn);}
+.hi{padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:all .12s;}
+.hi:hover{background:var(--sur2);color:var(--tx2);}
+.sb-bt{padding:8px;border-top:1px solid var(--bor);}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+#topbar{height:52px;flex-shrink:0;display:flex;align-items:center;padding:0 12px;gap:8px;border-bottom:1px solid var(--bor);background:var(--bg);}
+.mb{width:36px;height:36px;border-radius:9px;background:transparent;border:1.5px solid var(--bor);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;}
+.mb:hover{background:var(--sur2);color:var(--tx);}
+.mb svg{width:16px;height:16px;}
+.mw{position:relative;}
+.mbtn{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;background:transparent;border:1.5px solid var(--bor);color:var(--tx2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .12s;max-width:150px;}
+.mbtn:hover{border-color:var(--bor2);color:var(--tx);}
+.mdot{width:6px;height:6px;border-radius:50%;background:var(--grn);flex-shrink:0;}
+.mnm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mdd{display:none;position:absolute;top:42px;left:0;min-width:230px;background:var(--bg);border:1.5px solid var(--bor);border-radius:10px;overflow:hidden;z-index:200;box-shadow:0 8px 30px var(--shd);max-height:340px;overflow-y:auto;}
+.mdd.open{display:block;}
+.mgg{padding:7px 12px 3px;font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:.8px;text-transform:uppercase;border-top:1px solid var(--bor);}
+.mgg:first-child{border-top:none;}
+.mii{display:flex;align-items:center;padding:9px 12px;font-size:13px;cursor:pointer;color:var(--tx2);transition:background .1s;}
+.mii:hover{background:var(--sur2);color:var(--tx);}
+.mii.sel{color:var(--acc);}
+.mii .ck{margin-left:auto;opacity:0;font-size:12px;}
+.mii.sel .ck{opacity:1;color:var(--acc);}
+.tr{margin-left:auto;display:flex;gap:6px;align-items:center;}
+.tb{width:34px;height:34px;border-radius:8px;background:transparent;border:1.5px solid var(--bor);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .12s;}
+.tb:hover{background:var(--sur2);color:var(--tx);}
+.lbtn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;background:var(--acc);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.lbtn:hover{background:var(--acc2);}
+.uchip{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:20px;background:var(--sur2);border:1.5px solid var(--bor);cursor:pointer;}
+.uchip:hover{border-color:rgba(220,38,38,.4);}
+.uav{width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.unm{font-size:12px;font-weight:600;color:var(--tx);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#ca{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:var(--bg);}
+#wlc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;text-align:center;}
+.wlogo{width:54px;height:54px;border-radius:16px;background:var(--sur);border:1.5px solid var(--bor);display:flex;align-items:center;justify-content:center;font-size:25px;margin-bottom:16px;box-shadow:0 0 28px var(--glow);}
+#wlc h1{font-size:24px;font-weight:600;letter-spacing:-.5px;margin-bottom:7px;}
+#wlc p{font-size:13px;color:var(--tx2);max-width:340px;line-height:1.6;margin-bottom:26px;}
+.sggs{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:500px;}
+.sgg{padding:11px 13px;border-radius:12px;background:var(--sur);border:1.5px solid var(--bor);text-align:left;cursor:pointer;transition:all .15s;}
+.sgg:hover{border-color:var(--acc);background:var(--glow);}
+.sgi{font-size:18px;margin-bottom:4px;}
+.sgt{font-size:12px;font-weight:600;color:var(--tx);}
+.sgs{font-size:11px;color:var(--tx3);margin-top:2px;}
+#msgs{display:none;flex-direction:column;padding:14px 14px;max-width:720px;width:100%;margin:0 auto;}
+.mr{display:flex;gap:10px;padding:7px 0;animation:fu .2s ease;}
+.mr.u{flex-direction:row-reverse;}
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.mav{width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--sur2);border:1.5px solid var(--bor);margin-top:2px;font-weight:700;}
+.mr.u .mav{background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.2);color:var(--acc);}
+.mbd{max-width:82%;}
+.mr.u .mbd{display:flex;flex-direction:column;align-items:flex-end;}
+.mnm{font-size:10px;color:var(--tx3);margin-bottom:4px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.mbb{padding:11px 14px;border-radius:13px;font-size:14px;line-height:1.65;background:var(--sur);border:1.5px solid var(--bor);color:var(--tx);}
+.mr.u .mbb{background:rgba(37,99,235,.07);border-color:rgba(37,99,235,.18);border-bottom-right-radius:4px;}
+.mr.ai .mbb{border-bottom-left-radius:4px;}
+.mbb code{font-family:'DM Mono',monospace;font-size:12px;background:var(--sur2);padding:2px 5px;border-radius:4px;color:var(--acc);}
+.mbb pre{background:var(--cbg);border:1.5px solid var(--bor);border-radius:10px;margin:9px 0;overflow:hidden;}
+.cbh{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:rgba(255,255,255,.04);border-bottom:1px solid var(--bor);font-size:11px;font-family:'DM Mono',monospace;color:var(--tx3);}
+body:not(.dark) .cbh{background:rgba(0,0,0,.03);}
+.cbh button{font-size:11px;padding:2px 8px;border-radius:4px;cursor:pointer;background:var(--sur2);border:1px solid var(--bor);color:var(--tx3);font-family:'DM Sans',sans-serif;}
+.mbb pre code{display:block;padding:12px;background:none;color:#c9d1d9;font-size:12px;line-height:1.65;overflow-x:auto;}
+.macts{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;}
+.mact{padding:5px 11px;border-radius:6px;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;background:var(--sur2);border:1.5px solid var(--bor);color:var(--tx2);}
+.mact:hover{color:var(--tx);}
+.mact.pr{background:var(--acc);border-color:var(--acc);color:#fff;}
+.mact.pr:hover{background:var(--acc2);}
+.thk{display:flex;gap:4px;align-items:center;padding:4px 0;}
+.td{width:6px;height:6px;border-radius:50%;background:var(--tx3);animation:bl 1.2s infinite;}
+.td:nth-child(2){animation-delay:.2s;}.td:nth-child(3){animation-delay:.4s;}
+@keyframes bl{0%,80%,100%{opacity:.2}40%{opacity:1}}
+.mimg{max-width:220px;max-height:160px;border-radius:8px;object-fit:cover;margin-bottom:7px;display:block;border:1px solid var(--bor);}
+#ia{padding:10px 12px 14px;flex-shrink:0;background:var(--bg);}
+.ib{background:var(--bg);border:1.5px solid var(--bor);border-radius:16px;overflow:hidden;transition:all .15s;}
+.ib:focus-within{border-color:var(--acc);box-shadow:0 0 0 3px var(--glow);}
+.tkb{display:none;padding:8px 11px;border-bottom:1px solid var(--bor);background:rgba(37,99,235,.04);align-items:center;gap:7px;}
+.tkb.show{display:flex;}
+.tkb input{flex:1;background:var(--sur);border:1.5px solid var(--bor);color:var(--tx);border-radius:7px;padding:5px 9px;font-family:'DM Mono',monospace;font-size:12px;outline:none;min-width:0;}
+.tkb input:focus{border-color:var(--acc);}
+.tkl{font-size:12px;color:var(--tx2);flex-shrink:0;}
+.tkeye{width:30px;height:30px;border-radius:7px;background:var(--sur2);border:1.5px solid var(--bor);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tksv{padding:5px 11px;border-radius:6px;background:var(--acc);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;}
+.tkcl{background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ir{display:flex;align-items:flex-end;padding:9px 11px;gap:7px;}
+.pw{position:relative;flex-shrink:0;}
+.pb{width:32px;height:32px;border-radius:8px;background:var(--sur2);border:1.5px solid var(--bor);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.pmenu{display:none;position:absolute;bottom:40px;left:0;background:var(--bg);border:1.5px solid var(--bor);border-radius:10px;overflow:hidden;min-width:140px;box-shadow:0 8px 24px var(--shd);z-index:50;}
+.pmenu.open{display:block;}
+.pmi{padding:10px 13px;font-size:13px;cursor:pointer;color:var(--tx2);}
+.pmi:hover{background:var(--sur2);color:var(--tx);}
+#mi{flex:1;background:transparent;border:none;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;resize:none;outline:none;line-height:1.5;max-height:130px;min-height:24px;overflow-y:auto;}
+#mi::placeholder{color:var(--tx3);}
+.micb{width:32px;height:32px;border-radius:8px;background:transparent;border:1.5px solid var(--bor);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.micb.rec{background:rgba(220,38,38,.1);border-color:var(--red);color:var(--red);animation:pu 1s infinite;}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.5}}
+.sb2{width:32px;height:32px;border-radius:8px;background:var(--acc);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb2:hover{background:var(--acc2);}
+.sb2:disabled{background:var(--sur2);color:var(--tx3);cursor:not-allowed;}
+.iht{text-align:center;font-size:11px;color:var(--tx3);margin-top:6px;}
+.povl{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;backdrop-filter:blur(4px);}
+.povl.open{display:block;}
+.pan{position:fixed;right:0;top:0;bottom:0;width:92vw;max-width:500px;background:var(--sur);border-left:1.5px solid var(--bor);display:flex;flex-direction:column;z-index:101;transform:translateX(100%);transition:transform .25s ease;}
+.pan.wide{max-width:700px;}
+.pan.open{transform:translateX(0);}
+.phd{height:52px;display:flex;align-items:center;padding:0 15px;gap:9px;border-bottom:1px solid var(--bor);flex-shrink:0;}
+.ptl{font-size:14px;font-weight:600;}
+.pacts2{display:flex;gap:6px;margin-left:8px;}
+.pbtn{padding:5px 10px;border-radius:6px;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;background:var(--sur2);border:1.5px solid var(--bor);color:var(--tx2);cursor:pointer;}
+.pbtn.pr{background:var(--acc);border-color:var(--acc);color:#fff;}
+.pcl{margin-left:auto;width:28px;height:28px;border-radius:6px;background:none;border:none;color:var(--tx2);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+.pcl:hover{background:var(--sur2);color:var(--red);}
+.sbd{flex:1;overflow-y:auto;padding:15px;}
+.snv{display:flex;gap:3px;flex-wrap:wrap;background:var(--bg);border-radius:9px;padding:4px;border:1.5px solid var(--bor);margin-bottom:14px;}
+.sni{flex:1;min-width:55px;padding:6px 3px;text-align:center;font-size:11px;font-weight:600;border-radius:7px;cursor:pointer;color:var(--tx3);}
+.sni.act{background:var(--sur2);color:var(--tx);}
+.ssc{margin-bottom:18px;}
+.sst{font-size:10px;font-weight:600;color:var(--tx3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:9px;}
+.scd{background:var(--sur2);border:1.5px solid var(--bor);border-radius:10px;padding:12px;margin-bottom:8px;}
+.sch2{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.sct{font-size:13px;font-weight:500;}
+.sdsc{font-size:12px;color:var(--tx3);line-height:1.5;margin-bottom:7px;}
+.sinp{width:100%;background:var(--sur);border:1.5px solid var(--bor);color:var(--tx);border-radius:7px;padding:7px 10px;font-family:'DM Mono',monospace;font-size:12px;outline:none;margin-top:4px;}
+.sinp:focus{border-color:var(--acc);}
+.sinr{display:flex;gap:5px;margin-top:5px;}
+.seye{width:34px;height:34px;border-radius:7px;background:var(--sur);border:1.5px solid var(--bor);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ssv{padding:0 12px;height:34px;border-radius:7px;background:var(--acc);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.sbtn2{padding:7px 15px;border-radius:8px;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;border:1.5px solid var(--bor);background:var(--sur2);color:var(--tx2);}
+.sbtn2.pr{background:var(--acc);border-color:var(--acc);color:#fff;}
+.sbtn2.dg{background:var(--red);border-color:var(--red);color:#fff;}
+.cbdg{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(22,163,74,.1);color:var(--grn);border:1px solid rgba(22,163,74,.3);}
+.dbdg{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(220,38,38,.08);color:var(--red);border:1px solid rgba(220,38,38,.2);}
+.etbs{display:flex;background:var(--bg2);border-bottom:1.5px solid var(--bor);overflow-x:auto;flex-shrink:0;min-height:36px;}
+.et{display:flex;align-items:center;gap:5px;padding:0 12px;min-height:36px;font-size:12px;font-family:'DM Mono',monospace;color:var(--tx3);cursor:pointer;border-right:1px solid var(--bor);white-space:nowrap;}
+.et:hover{color:var(--tx2);background:var(--sur2);}
+.et.act{color:var(--tx);background:var(--sur);border-top:2px solid var(--acc);}
+.etx{opacity:.4;font-size:14px;}
+.et:hover .etx{opacity:1;}
+.etn{padding:0 10px;display:flex;align-items:center;color:var(--tx3);cursor:pointer;font-size:18px;}
+.etn:hover{color:var(--acc);}
+.ew{flex:1;display:flex;overflow:hidden;}
+.ln{padding:12px 10px 12px 6px;min-width:40px;font-family:'DM Mono',monospace;font-size:12px;color:var(--tx3);background:var(--bg2);text-align:right;user-select:none;line-height:1.65;overflow:hidden;flex-shrink:0;}
+#ced{flex:1;padding:12px 12px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.65;color:var(--tx);background:var(--bg);border:none;outline:none;resize:none;tab-size:2;overflow:auto;caret-color:var(--acc);}
+.esb{height:25px;display:flex;align-items:center;padding:0 12px;gap:14px;background:var(--acc);flex-shrink:0;font-size:11px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.85);}
+.trm{flex:1;overflow-y:auto;padding:12px 14px;background:#050508;font-family:'DM Mono',monospace;font-size:12px;color:#a3e635;line-height:1.7;}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--sur2);border:1.5px solid var(--bor2);padding:9px 18px;border-radius:10px;font-size:13px;z-index:999;opacity:0;transition:opacity .2s;box-shadow:0 4px 20px var(--shd);pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;}#toast.ok{border-color:rgba(22,163,74,.4);color:var(--grn);}#toast.err{border-color:rgba(220,38,38,.3);color:var(--red);}
+@media(max-width:600px){.sggs{grid-template-columns:1fr 1fr;}.mnm{max-width:80px;}.pan,.pan.wide{max-width:100vw;}}
 </style>
 </head>
-<body class="theme-light" id="appBody">
-
-<!-- Sidebar overlay (mobile) -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-
-<!-- SIDEBAR -->
-<div class="sidebar closed" id="sidebar">
-  <div class="sidebar-header">
+<body>
+<div id="app">
+<div id="sbBg" onclick="closeSB()"></div>
+<div id="sb">
+  <div class="sb-hd">
     <div class="logo"><div class="logo-dot"></div>Dev.ai Studio</div>
-    <button class="new-chat-btn" onclick="newChat()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-      </svg> New Chat
+    <button class="new-btn" onclick="newChat()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Chat
     </button>
   </div>
-
-  <div class="sidebar-scroll">
-    <div class="sidebar-label">Tools</div>
-    <div class="sidebar-item" onclick="openEditor();closeSidebar()"><span class="item-icon">⌨</span><span class="item-text">Code Editor</span></div>
-    <div class="sidebar-item" onclick="openTerminalPanel();closeSidebar()"><span class="item-icon">⬛</span><span class="item-text">Terminal</span></div>
-
-    <div class="sidebar-label">Integrations</div>
-    <div class="sidebar-item" onclick="openSettings('github');closeSidebar()">
-      <img src="assets/logos/github.svg" class="item-logo" id="ghLogo" style="width:16px;height:16px">
-      <span class="item-text">GitHub</span><span class="item-badge" id="badge-github">—</span>
-    </div>
-    <div class="sidebar-item" onclick="openSettings('vercel');closeSidebar()">
-      <img src="assets/logos/vercel.svg" class="item-logo" id="vLogo" style="width:16px;height:16px">
-      <span class="item-text">Vercel</span><span class="item-badge" id="badge-vercel">—</span>
-    </div>
-    <div class="sidebar-item" onclick="openSettings('netlify');closeSidebar()">
-      <img src="assets/logos/netlify.svg" class="item-logo" style="width:16px;height:16px">
-      <span class="item-text">Netlify</span><span class="item-badge" id="badge-netlify">—</span>
-    </div>
-    <div class="sidebar-item" onclick="openSettings('render');closeSidebar()">
-      <img src="assets/logos/render.svg" class="item-logo" style="width:16px;height:16px">
-      <span class="item-text">Render</span><span class="item-badge" id="badge-render">—</span>
-    </div>
-    <div class="sidebar-item" onclick="openSettings('railway');closeSidebar()">
-      <img src="assets/logos/railway.svg" class="item-logo" style="width:16px;height:16px">
-      <span class="item-text">Railway</span><span class="item-badge" id="badge-railway">—</span>
-    </div>
-    <div class="sidebar-item" onclick="openSettings('cloudflare');closeSidebar()">
-      <img src="assets/logos/cloudflare.svg" class="item-logo" style="width:16px;height:16px">
-      <span class="item-text">Cloudflare</span><span class="item-badge" id="badge-cloudflare">—</span>
-    </div>
-    <div class="sidebar-item" onclick="openSettings('codemagic');closeSidebar()">
-      <img src="assets/logos/codemagic.svg" class="item-logo" style="width:16px;height:16px">
-      <span class="item-text">Codemagic (APK)</span><span class="item-badge" id="badge-codemagic">—</span>
-    </div>
-
-    <div class="sidebar-label">History</div>
-    <div id="historyList" class="history-list"><div class="history-empty">No chats yet</div></div>
+  <div class="sb-sc">
+    <div class="sb-lbl">Tools</div>
+    <div class="si" onclick="openEd();closeSB()"><span class="ic">⌨</span><span class="tx">Code Editor</span></div>
+    <div class="si" onclick="openTrm();closeSB()"><span class="ic">⬛</span><span class="tx">Terminal</span></div>
+    <div class="sb-lbl">Integrations</div>
+    <div class="si" onclick="openSet('github');closeSB()"><img src="assets/logos/github.svg" id="ghL"><span class="tx">GitHub</span><span class="bx" id="b-github">—</span></div>
+    <div class="si" onclick="openSet('vercel');closeSB()"><img src="assets/logos/vercel.svg" id="vL"><span class="tx">Vercel</span><span class="bx" id="b-vercel">—</span></div>
+    <div class="si" onclick="openSet('netlify');closeSB()"><img src="assets/logos/netlify.svg"><span class="tx">Netlify</span><span class="bx" id="b-netlify">—</span></div>
+    <div class="si" onclick="openSet('render');closeSB()"><img src="assets/logos/render.svg"><span class="tx">Render</span><span class="bx" id="b-render">—</span></div>
+    <div class="si" onclick="openSet('railway');closeSB()"><img src="assets/logos/railway.svg"><span class="tx">Railway</span><span class="bx" id="b-railway">—</span></div>
+    <div class="si" onclick="openSet('cloudflare');closeSB()"><img src="assets/logos/cloudflare.svg"><span class="tx">Cloudflare</span><span class="bx" id="b-cloudflare">—</span></div>
+    <div class="si" onclick="openSet('codemagic');closeSB()"><img src="assets/logos/codemagic.svg"><span class="tx">Codemagic APK</span><span class="bx" id="b-codemagic">—</span></div>
+    <div class="sb-lbl">History</div>
+    <div id="hlist"><div style="padding:6px 10px;font-size:11px;color:var(--tx3)">No chats yet</div></div>
   </div>
-
-  <div class="sidebar-bottom">
-    <div class="sidebar-item" onclick="toggleTheme()">
-      <span class="item-icon" id="themeIcon">🌙</span>
-      <span class="item-text" id="themeLabel">Dark Mode</span>
-    </div>
-    <div class="sidebar-item" onclick="openSettings('general');closeSidebar()">
-      <span class="item-icon">⚙</span><span class="item-text">Settings</span>
-    </div>
+  <div class="sb-bt">
+    <div class="si" onclick="toggleTh()"><span class="ic" id="thIc">🌙</span><span class="tx" id="thLb">Dark Mode</span></div>
+    <div class="si" onclick="openSet('general');closeSB()"><span class="ic">⚙</span><span class="tx">Settings</span></div>
   </div>
 </div>
-
-<!-- MAIN -->
-<div class="main" id="main">
-
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <button class="menu-btn" onclick="toggleSidebar()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-      </svg>
+<div id="main">
+  <div id="topbar">
+    <button class="mb" onclick="toggleSB()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
-
-    <div class="model-selector-wrap">
-      <button class="model-selector" onclick="toggleModelDropdown()">
-        <span class="model-dot"></span>
-        <span id="modelName">claude-3-5-sonnet</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6,9 12,15 18,9"/></svg>
-      </button>
-      <div class="model-dropdown" id="modelDropdown"></div>
+    <div class="mw">
+      <button class="mbtn" onclick="toggleMDD()"><span class="mdot"></span><span class="mnm" id="mNm">claude-3-5-sonnet</span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6,9 12,15 18,9"/></svg></button>
+      <div class="mdd" id="mDD"></div>
     </div>
-
-    <div class="topbar-right">
-      <button class="icon-btn" onclick="toggleTokenBar()" title="Token">🔑</button>
-      <!-- LOGIN / USER CHIP -->
-      <div id="authArea">
-        <button class="topbar-login" id="loginBtn" onclick="handleAuth()">
-          <span>👤</span> Login
-        </button>
-      </div>
+    <div class="tr">
+      <button class="tb" onclick="toggleTB()">🔑</button>
+      <div id="authA"><button class="lbtn" onclick="doAuth()">👤 Login</button></div>
     </div>
   </div>
-
-  <!-- CHAT -->
-  <div class="chat-area" id="chatArea">
-    <div class="welcome" id="welcomeScreen">
-      <div class="welcome-logo">⚡</div>
+  <div id="ca">
+    <div id="wlc">
+      <div class="wlogo">⚡</div>
       <h1>Dev.ai Studio</h1>
       <p>AI coding assistant — Code लिखो, deploy करो, APK बनाओ।</p>
-      <div class="suggestions" id="suggestions"></div>
+      <div class="sggs" id="sggs"></div>
     </div>
-    <div class="messages" id="messages" style="display:none;"></div>
+    <div id="msgs"></div>
   </div>
-
-  <!-- INPUT -->
-  <div class="input-area">
-    <div class="input-wrap">
-      <div class="input-box">
-        <!-- Token bar -->
-        <div class="token-bar" id="tokenBar">
-          <span class="token-label">🔑</span>
-          <input class="token-input" id="inlineTokenInput" type="password" placeholder="Token paste करें...">
-          <button class="token-eye" onclick="toggleTokenVis()" id="tokenEye">👁</button>
-          <button class="token-save-btn" onclick="saveInlineToken()">Save</button>
-          <button class="token-close-btn" onclick="hideTokenBar()">×</button>
-        </div>
-        <div class="input-main">
-          <!-- Plus -->
-          <div class="plus-wrap">
-            <button class="plus-btn" onclick="togglePlusMenu()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-            </button>
-            <div class="plus-menu" id="plusMenu">
-              <div class="plus-item" onclick="uploadImage()">🖼 Image</div>
-              <div class="plus-item" onclick="uploadFile()">📎 File</div>
-              <div class="plus-item" onclick="openCamera()">📷 Camera</div>
-            </div>
-          </div>
-          <textarea id="mainInput" rows="1" placeholder="कुछ भी पूछो..."></textarea>
-          <!-- Mic -->
-          <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Voice Input">🎤</button>
-          <!-- Send -->
-          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/>
-            </svg>
-          </button>
-        </div>
+  <div id="ia">
+    <div class="ib">
+      <div class="tkb" id="tkb">
+        <span class="tkl">🔑</span>
+        <input type="password" id="tkI" placeholder="Token paste करें...">
+        <button class="tkeye" onclick="tkEye()">👁</button>
+        <button class="tksv" onclick="saveTk()">Save</button>
+        <button class="tkcl" onclick="hideTB()">×</button>
       </div>
-      <div class="input-hint">Puter.js · Free · <span id="modelStatus">Loading...</span></div>
+      <div class="ir">
+        <div class="pw">
+          <button class="pb" onclick="togglePM()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <div class="pmenu" id="pmenu">
+            <div class="pmi" onclick="doImg()">🖼 Image</div>
+            <div class="pmi" onclick="doFile()">📎 File</div>
+            <div class="pmi" onclick="doCam()">📷 Camera</div>
+          </div>
+        </div>
+        <textarea id="mi" rows="1" placeholder="कुछ भी पूछो..."></textarea>
+        <button class="micb" id="micB" onclick="toggleMic()">🎤</button>
+        <button class="sb2" id="sendB" onclick="sendMsg()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg></button>
+      </div>
     </div>
+    <div class="iht">Puter.js · Free · <span id="mSt">Loading...</span></div>
   </div>
 </div>
-
-<!-- PANELS -->
-<div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
-
-<div class="panel" id="settingsPanel">
-  <div class="panel-header">
-    <span>⚙</span><div class="panel-title">Settings</div>
-    <button class="panel-close" onclick="closePanel()">×</button>
-  </div>
-  <div class="settings-body" id="settingsBody"></div>
 </div>
+<div class="povl" id="povl" onclick="closePan()"></div>
+<div class="pan" id="setPan"><div class="phd"><span>⚙</span><div class="ptl">Settings</div><button class="pcl" onclick="closePan()">×</button></div><div class="sbd" id="setBd"></div></div>
+<div class="pan wide" id="edPan"><div class="phd"><span>⌨</span><div class="ptl">Code Editor</div><div class="pacts2"><button class="pbtn" onclick="saveFs()">💾</button><button class="pbtn pr" onclick="doPush()">🐙 Push</button></div><button class="pcl" onclick="closePan()">×</button></div><div class="etbs" id="etbs"></div><div class="ew"><div class="ln" id="ln">1</div><textarea id="ced" spellcheck="false"></textarea></div><div class="esb"><span id="eLng">HTML</span><span id="eCur">Ln 1, Col 1</span></div></div>
+<div class="pan wide" id="trmPan"><div class="phd"><span>⬛</span><div class="ptl">Terminal</div><button class="pcl" onclick="closePan()">×</button></div><div class="trm" id="trmOut"><span style="color:var(--acc)">Terminal Ready</span><br></div></div>
+<input type="file" id="imgI" accept="image/*" style="display:none" onchange="onImg(this)">
+<input type="file" id="fileI" style="display:none" onchange="onFl(this)">
+<input type="file" id="camI" accept="image/*" capture="environment" style="display:none" onchange="onImg(this)">
+<div id="toast"></div>
 
-<div class="panel panel-wide" id="editorPanel">
-  <div class="panel-header">
-    <span>⌨</span><div class="panel-title">Code Editor</div>
-    <div class="panel-actions">
-      <button class="panel-btn" onclick="saveAllFiles()">💾</button>
-      <button class="panel-btn primary" onclick="doPush()">🐙 Push</button>
-    </div>
-    <button class="panel-close" onclick="closePanel()">×</button>
-  </div>
-  <div class="editor-tabs-bar" id="editorTabsBar"></div>
-  <div class="editor-wrap">
-    <div class="line-nums" id="lineNums">1</div>
-    <textarea id="codeEditor" spellcheck="false"></textarea>
-  </div>
-  <div class="editor-statusbar">
-    <span id="editorLang">HTML</span>
-    <span id="editorCursor">Ln 1, Col 1</span>
-  </div>
-</div>
-
-<div class="panel panel-wide" id="terminalPanel">
-  <div class="panel-header">
-    <span>⬛</span><div class="panel-title">Terminal</div>
-    <button class="panel-close" onclick="closePanel()">×</button>
-  </div>
-  <div class="terminal-body" id="terminalBody"><span class="t-info">Dev.ai Studio Terminal Ready</span><br></div>
-</div>
-
-<input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleImgUpload(this)">
-<input type="file" id="fileInput" style="display:none" onchange="handleFileUpload(this)">
-<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleImgUpload(this)">
-<div class="toast" id="toast"></div>
-
-<!-- Firebase -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, query, orderBy, limit }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const fb = initializeApp({
-  apiKey:"AIzaSyDa_HS5OEDklgP3naQ9KI7j43gv71aIq4g",
-  authDomain:"devai-studio-1545d.firebaseapp.com",
-  projectId:"devai-studio-1545d",
-  storageBucket:"devai-studio-1545d.firebasestorage.app",
-  messagingSenderId:"66229703752",
-  appId:"1:66229703752:web:161715c1b05854c663747d"
-});
-const db = getFirestore(fb);
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,doc,setDoc,getDoc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const fb=initializeApp({apiKey:"AIzaSyDa_HS5OEDklgP3naQ9KI7j43gv71aIq4g",authDomain:"devai-studio-1545d.firebaseapp.com",projectId:"devai-studio-1545d",storageBucket:"devai-studio-1545d.firebasestorage.app",messagingSenderId:"66229703752",appId:"1:66229703752:web:161715c1b05854c663747d"});
+const db=getFirestore(fb);
 const enc=v=>{try{return btoa(unescape(encodeURIComponent(v)));}catch{return v;}};
 const dec=v=>{try{return decodeURIComponent(escape(atob(v)));}catch{return v;}};
 window.FB={
-  async saveUser(u){if(!u?.uuid)return;try{const r=doc(db,"users",u.uuid),s=await getDoc(r);if(!s.exists())await setDoc(r,{uid:u.uuid,name:u.username||"User",email:u.email||"",createdAt:new Date().toISOString(),lastSeen:new Date().toISOString()});else await updateDoc(r,{lastSeen:new Date().toISOString()});}catch(e){}},
-  async saveTokens(uid,t){if(!uid)return;try{const e={};for(const[k,v]of Object.entries(t))e[k]=v?enc(v):"";await setDoc(doc(db,"users",uid,"private","tokens"),e,{merge:true});}catch(e){}},
-  async loadTokens(uid){if(!uid)return{};try{const s=await getDoc(doc(db,"users",uid,"private","tokens"));if(!s.exists())return{};const r={};for(const[k,v]of Object.entries(s.data()))r[k]=v?dec(v):"";return r;}catch(e){return{};}},
-  async saveSettings(uid,s){if(!uid)return;try{await setDoc(doc(db,"users",uid,"settings","prefs"),s,{merge:true});}catch(e){}},
-  async loadSettings(uid){if(!uid)return null;try{const s=await getDoc(doc(db,"users",uid,"settings","prefs"));return s.exists()?s.data():null;}catch(e){return null;}},
-  async saveChat(uid,cid,msgs){if(!uid)return;try{await setDoc(doc(db,"users",uid,"chats",cid),{messages:msgs,updatedAt:new Date().toISOString()},{merge:true});}catch(e){}}
+  async su(u){if(!u?.uuid)return;try{const r=doc(db,"users",u.uuid),s=await getDoc(r);s.exists()?await updateDoc(r,{ls:new Date().toISOString()}):await setDoc(r,{uid:u.uuid,name:u.username||"User",ca:new Date().toISOString(),ls:new Date().toISOString()});}catch(e){}},
+  async st(uid,t){if(!uid)return;try{const e={};for(const[k,v]of Object.entries(t))e[k]=v?enc(v):"";await setDoc(doc(db,"users",uid,"p","t"),e,{merge:true});}catch(e){}},
+  async lt(uid){if(!uid)return{};try{const s=await getDoc(doc(db,"users",uid,"p","t"));if(!s.exists())return{};const r={};for(const[k,v]of Object.entries(s.data()))r[k]=v?dec(v):"";return r;}catch(e){return{};}},
+  async ss(uid,s){if(!uid)return;try{await setDoc(doc(db,"users",uid,"c","p"),s,{merge:true});}catch(e){}},
+  async ls(uid){if(!uid)return null;try{const s=await getDoc(doc(db,"users",uid,"c","p"));return s.exists()?s.data():null;}catch(e){return null;}}
 };
 </script>
-
 <script src="https://js.puter.com/v2/"></script>
-
 <script>
-// ════════════════════════════════════
-// STATE
-// ════════════════════════════════════
-const S={
-  user:null, uid:null,
-  model:"claude-3-5-sonnet", modelName:"claude-3-5-sonnet",
-  theme:"light", sidebarOpen:false,
-  tokens:{github:"",vercel:"",netlify:"",render:"",railway:"",cloudflare:"",codemagic:""},
-  github:{username:"",repo:"",branch:"main"},
-  files:{"index.html":"<!DOCTYPE html>\n<html>\n<head><title>My App</title></head>\n<body><h1>Hello!</h1></body>\n</html>","style.css":"body{font-family:sans-serif;margin:0;}","app.js":"console.log('Hello!');"},
-  activeFile:"index.html",
-  chatHistory:[], chatId:"chat_"+Date.now()
-};
-try{const sv=JSON.parse(localStorage.getItem("devai_v4")||"{}");if(sv.tokens)S.tokens={...S.tokens,...sv.tokens};if(sv.github)S.github={...S.github,...sv.github};if(sv.model)S.model=sv.model;if(sv.modelName)S.modelName=sv.modelName;if(sv.files&&Object.keys(sv.files).length)S.files=sv.files;}catch(e){}
-function saveLocal(){localStorage.setItem("devai_v4",JSON.stringify({tokens:S.tokens,github:S.github,model:S.model,modelName:S.modelName,files:S.files}));}
+const S={user:null,uid:null,model:"claude-3-5-sonnet",mN:"claude-3-5-sonnet",theme:"light",sbO:false,tok:{github:"",vercel:"",netlify:"",render:"",railway:"",cloudflare:"",codemagic:""},gh:{u:"",r:"",b:"main"},files:{"index.html":"<!DOCTYPE html>\n<html>\n<head><title>My App</title></head>\n<body>\n<h1>Hello!</h1>\n</body>\n</html>","style.css":"body{font-family:sans-serif;margin:0;}","app.js":"console.log('Hello!');"},af:"index.html",chatH:[],cid:"c_"+Date.now()};
+try{const sv=JSON.parse(localStorage.getItem("d6")||"{}");if(sv.tok)S.tok={...S.tok,...sv.tok};if(sv.gh)S.gh={...S.gh,...sv.gh};if(sv.model)S.model=sv.model;if(sv.mN)S.mN=sv.mN;if(sv.files&&Object.keys(sv.files).length)S.files=sv.files;}catch(e){}
+const sv=()=>localStorage.setItem("d6",JSON.stringify({tok:S.tok,gh:S.gh,model:S.model,mN:S.mN,files:S.files}));
 
-// ════════════════════════════════════
-// CORRECT PUTER MODEL IDs
-// ════════════════════════════════════
-const MODELS={
-  "🌟 Top":[
-    {id:"claude-sonnet-4-5",name:"Claude Sonnet 4.5"},
-    {id:"claude-3-5-sonnet",name:"Claude 3.5 Sonnet"},
-    {id:"gpt-4o",name:"GPT-4o"},
-    {id:"gpt-4.1",name:"GPT-4.1"},
-    {id:"gemini-2.5-pro",name:"Gemini 2.5 Pro"},
-    {id:"o3-mini",name:"o3 Mini"},
-  ],
-  "⚡ Fast":[
-    {id:"claude-3-5-haiku",name:"Claude 3.5 Haiku"},
-    {id:"gpt-4o-mini",name:"GPT-4o Mini"},
-    {id:"gpt-4.1-mini",name:"GPT-4.1 Mini"},
-    {id:"gpt-4.1-nano",name:"GPT-4.1 Nano"},
-    {id:"gemini-2.5-flash",name:"Gemini 2.5 Flash"},
-    {id:"gemini-2.0-flash",name:"Gemini 2.0 Flash"},
-    {id:"gemini-1.5-flash",name:"Gemini 1.5 Flash"},
-  ],
-  "🌐 Open Source":[
-    {id:"meta-llama/llama-3.3-70b-instruct",name:"Llama 3.3 70B"},
-    {id:"meta-llama/llama-3.1-8b-instruct",name:"Llama 3.1 8B"},
-    {id:"deepseek/deepseek-r1",name:"DeepSeek R1"},
-    {id:"deepseek/deepseek-chat-v3-0324",name:"DeepSeek Chat"},
-    {id:"mistralai/mixtral-8x7b-instruct",name:"Mixtral 8x7B"},
-    {id:"qwen/qwen-2.5-72b-instruct",name:"Qwen 2.5 72B"},
-    {id:"google/gemma-3-27b-it",name:"Gemma 3 27B"},
-    {id:"x-ai/grok-3-mini-beta",name:"Grok 3 Mini"},
-  ]
-};
-// Fallback chain — correct IDs
-const FALLBACK=["claude-3-5-sonnet","claude-3-5-haiku","gpt-4o-mini","gpt-4.1-nano","gemini-2.0-flash","meta-llama/llama-3.1-8b-instruct"];
+const MODS={"🌟 Top":[{id:"claude-sonnet-4-5",n:"Claude Sonnet 4.5"},{id:"claude-3-5-sonnet",n:"Claude 3.5 Sonnet"},{id:"gpt-4o",n:"GPT-4o"},{id:"gpt-4.1",n:"GPT-4.1"},{id:"gemini-2.5-pro",n:"Gemini 2.5 Pro"},{id:"o3-mini",n:"o3 Mini"}],"⚡ Fast":[{id:"claude-3-5-haiku",n:"Claude 3.5 Haiku"},{id:"gpt-4o-mini",n:"GPT-4o Mini"},{id:"gpt-4.1-mini",n:"GPT-4.1 Mini"},{id:"gpt-4.1-nano",n:"GPT-4.1 Nano"},{id:"gemini-2.5-flash",n:"Gemini 2.5 Flash"},{id:"gemini-2.0-flash",n:"Gemini 2.0 Flash"}],"🌐 Open":[{id:"meta-llama/llama-3.3-70b-instruct",n:"Llama 3.3 70B"},{id:"meta-llama/llama-3.1-8b-instruct",n:"Llama 3.1 8B"},{id:"deepseek/deepseek-r1",n:"DeepSeek R1"},{id:"deepseek/deepseek-chat-v3-0324",n:"DeepSeek Chat"},{id:"mistralai/mixtral-8x7b-instruct",n:"Mixtral 8x7B"},{id:"x-ai/grok-3-mini-beta",n:"Grok 3 Mini"}]};
+const FBC=["claude-3-5-sonnet","claude-3-5-haiku","gpt-4o-mini","gpt-4.1-nano","gemini-2.0-flash","meta-llama/llama-3.1-8b-instruct"];
 
-// ════════════════════════════════════
-// THEME
-// ════════════════════════════════════
-function applyTheme(t){
-  S.theme=t; document.body.className="theme-"+t;
-  const ic=document.getElementById("themeIcon"),lb=document.getElementById("themeLabel");
-  const ghL=document.getElementById("ghLogo"),vL=document.getElementById("vLogo");
-  if(t==="dark"){if(ic)ic.textContent="☀";if(lb)lb.textContent="Light Mode";if(ghL)ghL.style.filter="invert(1) brightness(0.8)";if(vL)vL.style.filter="invert(1) brightness(0.8)";}
-  else{if(ic)ic.textContent="🌙";if(lb)lb.textContent="Dark Mode";if(ghL)ghL.style.filter="none";if(vL)vL.style.filter="none";}
-  localStorage.setItem("devai_theme",t);
-}
-function toggleTheme(){applyTheme(S.theme==="dark"?"light":"dark");if(S.uid&&window.FB)FB.saveSettings(S.uid,{theme:S.theme});}
+function initMods(){const dd=document.getElementById("mDD");let h="";for(const[g,ms]of Object.entries(MODS)){h+=`<div class="mgg">${g}</div>`;ms.forEach(m=>{h+=`<div class="mii${m.id===S.model?" sel":""}" onclick="pickM('${m.id}','${m.n.replace(/'/g,"\\'")}')"><span style="flex:1">${m.n}</span><span class="ck">✓</span></div>`;});}dd.innerHTML=h;document.getElementById("mNm").textContent=S.mN;}
+function toggleMDD(){document.getElementById("mDD").classList.toggle("open");}
+function pickM(id,n){S.model=id;S.mN=n;document.getElementById("mNm").textContent=n;document.getElementById("mDD").classList.remove("open");document.querySelectorAll(".mii").forEach(e=>e.classList.toggle("sel",e.querySelector("span")?.textContent===n));sv();if(S.uid&&window.FB)FB.ss(S.uid,{theme:S.theme,model:id,mN:n});}
 
-// ════════════════════════════════════
-// SIDEBAR
-// ════════════════════════════════════
-function toggleSidebar(){S.sidebarOpen=!S.sidebarOpen;document.getElementById("sidebar").classList.toggle("closed",!S.sidebarOpen);document.getElementById("sidebarOverlay").classList.toggle("show",S.sidebarOpen);}
-function closeSidebar(){S.sidebarOpen=false;document.getElementById("sidebar").classList.add("closed");document.getElementById("sidebarOverlay").classList.remove("show");}
-function updateBadges(){["github","vercel","netlify","render","railway","cloudflare","codemagic"].forEach(s=>{const el=document.getElementById("badge-"+s);if(!el)return;el.textContent=S.tokens[s]?"✓":"—";el.classList.toggle("connected",!!S.tokens[s]);});}
+function applyTh(t){S.theme=t;document.body.classList.toggle("dark",t==="dark");const ic=document.getElementById("thIc"),lb=document.getElementById("thLb"),gh=document.getElementById("ghL"),v=document.getElementById("vL");if(t==="dark"){if(ic)ic.textContent="☀";if(lb)lb.textContent="Light Mode";if(gh)gh.style.filter="invert(1) brightness(.8)";if(v)v.style.filter="invert(1) brightness(.8)";}else{if(ic)ic.textContent="🌙";if(lb)lb.textContent="Dark Mode";if(gh)gh.style.filter="none";if(v)v.style.filter="none";}localStorage.setItem("d_th",t);}
+function toggleTh(){applyTh(S.theme==="dark"?"light":"dark");if(S.uid&&window.FB)FB.ss(S.uid,{theme:S.theme});}
 
-// ════════════════════════════════════
-// AUTH
-// ════════════════════════════════════
-async function handleAuth(){
-  if(typeof puter==="undefined"){showToast("Puter.js not loaded","error");return;}
-  try{
-    if(S.user){await puter.auth.signOut();S.user=null;S.uid=null;renderAuthArea(false);showToast("Logged out","success");}
-    else{const u=await puter.auth.signIn();await onLogin(u);showToast("Welcome "+getDisplayName(u)+"! ✓","success");}
-  }catch(e){showToast("Auth: "+e.message,"error");}
-}
-async function onLogin(u){
-  S.user=u;S.uid=u.uuid;renderAuthArea(true,u);
-  if(window.FB){await FB.saveUser(u);const t=await FB.loadTokens(u.uuid);if(t){S.tokens={...S.tokens,...t};updateBadges();}const set=await FB.loadSettings(u.uuid);if(set?.theme)applyTheme(set.theme);if(set?.model){S.model=set.model;S.modelName=set.modelName||set.model;document.getElementById("modelName").textContent=S.modelName;}}
-}
-function getDisplayName(u){return u?.username||u?.email?.split("@")[0]||"User";}
-function getInitials(u){const n=getDisplayName(u);return n.substring(0,2).toUpperCase();}
-function renderAuthArea(loggedIn,u){
-  const area=document.getElementById("authArea");if(!area)return;
-  if(loggedIn&&u){
-    area.innerHTML=`<div class="user-chip" onclick="openSettings('general')"><div class="user-avatar">${getInitials(u)}</div><span class="user-name">${getDisplayName(u)}</span></div>`;
-    document.getElementById("modelStatus").textContent="✓ "+getDisplayName(u);
-  }else{
-    area.innerHTML=`<button class="topbar-login" onclick="handleAuth()"><span>👤</span> Login</button>`;
-    document.getElementById("modelStatus").textContent="Ready";
-  }
-}
+function toggleSB(){S.sbO=!S.sbO;document.getElementById("sb").classList.toggle("open",S.sbO);document.getElementById("sbBg").classList.toggle("show",S.sbO);}
+function closeSB(){S.sbO=false;document.getElementById("sb").classList.remove("open");document.getElementById("sbBg").classList.remove("show");}
+function updB(){["github","vercel","netlify","render","railway","cloudflare","codemagic"].forEach(s=>{const el=document.getElementById("b-"+s);if(!el)return;el.textContent=S.tok[s]?"✓":"—";el.classList.toggle("on",!!S.tok[s]);});}
 
-// ════════════════════════════════════
-// TOKEN BAR
-// ════════════════════════════════════
+function getDN(u){return u?.username||u?.email?.split("@")[0]||"User";}
+function getIn(u){return getDN(u).substring(0,2).toUpperCase();}
+async function doAuth(){if(typeof puter==="undefined"){toast("Puter.js not loaded","err");return;}try{if(S.user){await puter.auth.signOut();S.user=null;S.uid=null;renderAuth(false);toast("Logged out");}else{const u=await puter.auth.signIn();await onLogin(u);toast("Welcome "+getDN(u)+"!","ok");}}catch(e){toast("Auth: "+e.message,"err");}}
+async function onLogin(u){S.user=u;S.uid=u.uuid;renderAuth(true,u);if(window.FB){await FB.su(u);const t=await FB.lt(u.uuid);if(t){S.tok={...S.tok,...t};updB();}const set=await FB.ls(u.uuid);if(set?.theme)applyTh(set.theme);if(set?.model){S.model=set.model;S.mN=set.mN||set.model;document.getElementById("mNm").textContent=S.mN;}}document.getElementById("mSt").textContent="✓ "+getDN(u);}
+function renderAuth(in_,u){const a=document.getElementById("authA");if(!a)return;if(in_&&u)a.innerHTML=`<div class="uchip" onclick="openSet('general')"><div class="uav">${getIn(u)}</div><span class="unm">${getDN(u)}</span></div>`;else a.innerHTML=`<button class="lbtn" onclick="doAuth()">👤 Login</button>`;}
+
 let _tb=false;
-function toggleTokenBa
+function toggleTB(){_tb=!_tb;document.getElementById("tkb").classList.toggle("show",_tb);if(_tb)document.getElementById("tkI").focus();}
+function hideTB(){_tb=false;document.getElementById("tkb").classList.remove("show");}
+function tkEye(){const i=document.getElementById("tkI");i.type=i.type==="password"?"text":"password";}
+async function saveTk(){const v=document.getElementById("tkI").value.trim();if(!v)return toast("Token empty!","err");let s="github";if(v.startsWith("ghp_")||v.startsWith("github_pat_"))s="github";else if(v.startsWith("Bearer "))s="vercel";S.tok[s]=v;sv();if(S.uid&&window.FB)await FB.st(S.uid,S.tok);updB();hideTB();document.getElementById("tkI").value="";toast("✓ "+s+" saved!","ok");}
+
+let _pm=false;
+function togglePM(){_pm=!_pm;document.getElementById("pmenu").classList.toggle("open",_pm);}
+function doImg(){_pm=false;document.getElementById("pmenu").classList.remove("open");document.getElementById("imgI").click();}
+function doFile(){_pm=false;document.getElementById("pmenu").classList.remove("open");document.getElementById("fileI").click();}
+function doCam(){_pm=false;document.getElementById("pmenu").classList.remove("open");document.getElementById("camI").click();}
+function onImg(inp){const f=inp.files?.[0];if(!f)return;const r=new FileReader();r.onload=e=>{window._pI={d:e.target.result,n:f.name};toast("📎 "+f.name,"ok");};r.readAsDataURL(f);}
+function onFl(inp){const f=inp.files?.[0];if(!f)return;const r=new FileReader();r.onload=e=>{window._pF={c:e.target.result,n:f.name};toast("📎 "+f.name,"ok");};r.readAsText(f);}
+
+document.addEventListener("click",e=>{if(!e.target.closest(".mw"))document.getElementById("mDD").classList.remove("open");if(!e.target.closest(".pw")){_pm=false;document.getElementById("pmenu").classList.remove("open");}});
+
+let _recO=false,_rec=null;
+function toggleMic(){if(!("webkitSpeechRecognition" in window||"SpeechRecognition" in window)){toast("Browser mic not supported","err");return;}if(_recO){_rec?.stop();return;}const SR=window.SpeechRecognition||window.webkitSpeechRecognition;_rec=new SR();_rec.lang="hi-IN";_rec.continuous=false;_rec.interimResults=true;_recO=true;const mb=document.getElementById("micB");mb.classList.add("rec");mb.textContent="🔴";_rec.onresult=e=>{let t="";for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById("mi").value=t;};_rec.onend=()=>{_recO=false;mb.classList.remove("rec");mb.textContent="🎤";};_rec.onerror=e=>{_recO=false;mb.classList.remove("rec");mb.textContent="🎤";toast("Mic: "+e.error,"err");};_rec.start();}
+
+async function callAI(p,img){if(typeof puter==="undefined")throw new Error("Login to Puter for free AI");const chain=[S.model,...FBC.filter(m=>m!==S.model)];const tried=new Set();for(const m of chain){if(tried.has(m))continue;tried.add(m);try{let res;if(img)res=await puter.ai.chat([{role:"user",content:[{type:"image_url",image_url:{url:img}},{type:"text",text:p}]}],{model:m});else res=await puter.ai.chat(p,{model:m});const text=typeof res==="string"?res:res?.message?.content?.[0]?.text||res?.message?.content||JSON.stringify(res);if(text){tlog("✓ "+m,"ok");return text;}}catch(e){tlog("✗ "+m,"warn");}}throw new Error("All models failed. Please login to Puter.");}
+
+const mi=document.getElementById("mi");
+mi.addEventListener("input",function(){this.style.height="auto";this.style.height=Math.min(this.scrollHeight,130)+"px";});
+mi.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMsg();}});
+
+function newChat(){S.chatH=[];S.cid="c_"+Date.now();const m=document.getElementById("msgs");m.innerHTML="";m.style.display="none";document.getElementById("wlc").style.display="flex";window._pI=null;window._pF=null;closeSB();}
+function suggest(t){document.getElementById("mi").value=t;sendMsg();}
+function initSggs(){document.getElementById("sggs").innerHTML=[{i:"🛒",t:"E-commerce",s:"React project",p:"React में ecommerce website बनाओ"},{i:"📱",t:"Mobile UI",s:"HTML CSS",p:"Mobile app UI बनाओ"},{i:"🐙",t:"GitHub Push",s:"Push files",p:"code GitHub push करो"},{i:"🚀",t:"Deploy",s:"Vercel/Netlify",p:"app deploy करो"},{i:"🔧",t:"Fix Code",s:"Debug",p:"code fix करो"},{i:"📦",t:"Build APK",s:"Android",p:"APK build करो"}].map(x=>`<div class="sgg" onclick="suggest('${x.p}')"><div class="sgi">${x.i}</div><div class="sgt">${x.t}</div><div class="sgs">${x.s}</div></div>`).join("");}
+
+async function sendMsg(){const text=mi.value.trim();if(!text)return;mi.value="";mi.style.height="auto";document.getElementById("wlc").style.display="none";const msgs=document.getElementById("msgs");msgs.style.display="flex";const img=window._pI,file=window._pF;window._pI=null;window._pF=null;addU(text,img);S.chatH.push({role:"user",content:text});const th=addTh();document.getElementById("sendB").disabled=true;
+try{const lo=text.toLowerCase();const nGH=lo.includes("github")||lo.includes("push");const nDp=lo.includes("deploy")||lo.includes("vercel")||lo.includes("netlify");const nAPK=lo.includes("apk")||lo.includes("codemagic");const nTok=lo.includes("token")&&(lo.includes("add")||lo.includes("save")||lo.includes("डाल")||lo.includes("जोड़"));
+if(nTok){th.remove();showTokPop();document.getElementById("sendB").disabled=false;return;}
+if(nGH&&!S.tok.github){th.remove();addAI(ntMsg("github"));document.getElementById("sendB").disabled=false;return;}
+if(nDp&&!S.tok.vercel&&!S.tok.netlify){th.remove();addAI(ntMsg("deploy"));document.getElementById("sendB").disabled=false;return;}
+if(nAPK&&!S.tok.codemagic){th.remove();addAI(ntMsg("codemagic"));document.getElementById("sendB").disabled=false;return;}
+let sys=`You are Dev.ai Studio AI.\nUser: ${S.user?getDN(S.user):"Dev"}\nConnected: ${Object.entries(S.tok).filter(([k,v])=>v).map(([k])=>k).join(",")||"none"}\nFiles: ${Object.keys(S.files).join(", ")}\nFor code: // File: name.ext then code block.\nBe helpful, Hindi/English mix ok.`;
+if(file)sys+=`\nFile (${file.n}):\n\`\`\`\n${file.c.substring(0,2000)}\n\`\`\``;
+const reply=await callAI(sys+"\n\nUser: "+text,img?.d||null);th.remove();extFiles(reply);addAI(reply);S.chatH.push({role:"assistant",content:reply});addHist(text);}
+catch(e){th.remove();addAI("❌ **Error:** "+e.message);}
+document.getElementById("sendB").disabled=false;}
+
+function ntMsg(t){return{github:"🐙 **GitHub token नहीं है!**\n\n🔑 button → Token paste → Save\n\nया ☰ → GitHub → Token add",deploy:"🚀 **Deploy token नहीं!**\n\n☰ → Vercel/Netlify → Token add",codemagic:"🪄 **Codemagic token नहीं!**\n\n☰ → Codemagic → API Key"}[t]||"Settings में token add करो।";}
+function extFiles(text){const re=/\/\/\s*File:\s*([\w.\-/]+)\s*\n```(?:\w+)?\n([\s\S]*?)```/gi;let m,n=0;while((m=re.exec(text))!==null){S.files[m[1].trim()]=m[2].trim();n++;}if(n>0){sv();toast("✓ "+n+" file(s)!","ok");}}
+function addU(text,img){const msgs=document.getElementById("msgs");const r=document.createElement("div");r.className="mr u";const av=S.user?getIn(S.user):"👤";r.innerHTML=`<div class="mav">${av}</div><div class="mbd"><div class="mnm">YOU</div><div class="mbb">${img?`<img src="${img.d}" class="mimg">`:""} ${esc(text).replace(/\n/g,"<br>")}</div></div>`;msgs.appendChild(r);scr();}
+function addTh(){const msgs=document.getElementById("msgs");const r=document.createElement("div");r.className="mr ai";r.innerHTML=`<div class="mav">⚡</div><div class="mbd"><div class="mnm">DEV.AI</div><div class="mbb"><div class="thk"><div class="td"></div><div class="td"></div><div class="td"></div></div></div></div>`;msgs.appendChild(r);scr();return r;}
+function addAI(text){const msgs=document.getElementById("msgs");const r=document.createElement("div");r.className="mr ai";const b=document.createElement("div");b.className="mbb";b.innerHTML=fmt(text);const lo=text.toLowerCase();const btns=[];if(text.includes("```")||Object.keys(S.files).length>3)btns.push({l:"⌨ Editor",fn:()=>openEd()});if(lo.includes("github")||text.includes("```"))btns.push({l:"🐙 Push",pr:true,fn:()=>doPush()});if(lo.includes("deploy"))btns.push({l:"🚀 Deploy",fn:()=>dpOpts()});if(btns.length){const d=document.createElement("div");d.className="macts";d.style.marginTop="9px";btns.forEach(b2=>{const btn=document.createElement("button");btn.className="mact"+(b2.pr?" pr":"");btn.textContent=b2.l;btn.onclick=b2.fn;d.appendChild(btn);});b.appendChild(d);}r.innerHTML=`<div class="mav">⚡</div><div class="mbd"><div class="mnm">DEV.AI</div></div>`;r.querySelector(".mbd").appendChild(b);msgs.appendChild(r);scr();}
+function addHist(t){const l=document.getElementById("hlist");const e=l.querySelector("div[style]");if(e)e.remove();const item=document.createElement("div");item.className="hi";item.textContent=t.substring(0,35)+(t.length>35?"...":"");l.insertBefore(item,l.firstChild);if(l.children.length>15)l.lastChild.remove();}
+function fmt(t){t=t.replace(/```(\w+)?\n?([\s\S]*?)```/g,(_,l,c)=>`<div class="cbh"><span>${l||"code"}</span><button onclick="cpC(this)">Copy</button></div><pre><code>${esc(c.trim())}</code></pre>`);t=t.replace(/`([^`]+)`/g,"<code>$1</code>");t=t.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");t=t.replace(/\*([^*]+)\*/g,"<em>$1</em>");t=t.replace(/^-\s(.+)$/gm,"<li style='margin:2px 0;list-style:none;padding-left:14px'>• $1</li>");t=t.replace(/\n/g,"<br>");return t;}
+function esc(t){return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function scr(){const a=document.getElementById("ca");if(a)a.scrollTop=a.scrollHeight;}
+function cpC(btn){const c=btn.closest(".mbb")?.querySelector("code");if(c)navigator.clipboard.writeText(c.textContent).then(()=>toast("Copied!","ok"));}
+
+function showTokPop(svc){const svcs=[{id:"github",l:"GitHub"},{id:"vercel",l:"Vercel"},{id:"netlify",l:"Netlify"},{id:"render",l:"Render"},{id:"railway",l:"Railway"},{id:"cloudflare",l:"CF"},{id:"codemagic",l:"Codemagic"}];window._cs=svc||"github";const msgs=document.getElementById("msgs");msgs.style.display="flex";document.getElementById("wlc").style.display="none";const old=document.getElementById("ctpR");if(old)old.remove();const r=document.createElement("div");r.className="mr ai";r.id="ctpR";r.innerHTML=`<div class="mav">⚡</div><div class="mbd" style="max-width:96%"><div class="mnm">DEV.AI</div><div class="mbb" style="padding:14px"><div style="font-weight:600;margin-bottom:6px">🔑 Token Add करो</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px">${svcs.map(s=>`<span style="padding:3px 9px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--bor);background:${s.id===window._cs?"var(--acc)":"var(--sur2)"};color:${s.id===window._cs?"#fff":"var(--tx2)"}" onclick="cSvc('${s.id}',this)">${s.l}</span>`).join("")}</div><div style="display:flex;gap:6px;margin-bottom:10px"><input id="ctpI" type="password" placeholder="Token paste करो..." style="flex:1;background:var(--sur2);border:1.5px solid var(--bor);color:var(--tx);border-radius:8px;padding:8px 10px;font-family:'DM Mono',monospace;font-size:12px;outline:none;min-width:0"><button onclick="cEye()" style="width:33px;height:33px;border-radius:7px;background:var(--sur2);border:1.5px solid var(--bor);cursor:pointer;flex-shrink:0" id="cEB">👁</button></div><div style="display:flex;gap:7px"><button class="mact pr" onclick="cSave()">✓ Save</button><button class="mact" onclick="document.getElementById('ctpR')?.remove()">Cancel</button></div></div></div>`;msgs.appendChild(r);scr();setTimeout(()=>document.getElementById("ctpI")?.focus(),100);}
+function cSvc(s,el){window._cs=s;document.querySelectorAll("#ctpR [onclick^='cSvc']").forEach(e=>{e.style.background="var(--sur2)";e.style.color="var(--tx2)";});el.style.background="var(--acc)";el.style.color="#fff";}
+function cEye(){const i=document.getElementById("ctpI"),b=document.getElementById("cEB");if(!i)return;i.type=i.type==="password"?"text":"password";b.textContent=i.type==="password"?"👁":"🙈";}
+async function cSave(){const v=document.getElementById("ctpI")?.value.trim();if(!v){toast("Empty!","err");return;}S.tok[window._cs]=v;sv();if(S.uid&&window.FB)await FB.st(S.uid,S.tok);updB();document.getElementById("ctpR")?.remove();addAI("✅ **"+window._cs+" token saved!**");}
+
+async function doPush(){if(!S.tok.github){toast("GitHub token add करो!","err");openSet("github");return;}if(!S.gh.u||!S.gh.r){toast("Username/repo add करो!","err");openSet("github");return;}const{u,r,b}=S.gh,token=S.tok.github;const ed=document.getElementById("ced");if(ed)S.files[S.af]=ed.value;tlog("🐙 Pushing...","info");toast("Pushing...");let ok=0,fail=0;for(const[fn,ct]of Object.entries(S.files)){try{let sha=null;try{const res=await fetch(`https://api.github.com/repos/${u}/${r}/contents/${fn}`,{headers:{Authorization:`token ${token}`}});if(res.ok){const d=await res.json();sha=d.sha;}}catch(_){}const body={message:"update from Dev.ai Studio",content:btoa(unescape(encodeURIComponent(ct))),branch:b};if(sha)body.sha=sha;const res=await fetch(`https://api.github.com/repos/${u}/${r}/contents/${fn}`,{method:"PUT",headers:{Authorization:`token ${token}`,"Content-Type":"application/json"},body:JSON.stringify(body)});if(res.ok){ok++;tlog("  ✓ "+fn,"ok");}else{fail++;const e=await res.json();tlog("  ✗ "+fn+": "+e.message,"err");}}catch(e){fail++;tlog("  ✗ "+fn,"err");}}if(ok>0){toast("✓ "+ok+" pushed!","ok");addAI("✅ **"+ok+" files** → **"+u+"/"+r+"**\n\n🔗 https://github.com/"+u+"/"+r);}else toast("Push failed!","err");}
+
+function dpOpts(){const conn=Object.entries(S.tok).filter(([k,v])=>["vercel","netlify","render","railway","cloudflare"].includes(k)&&v).map(([k])=>k);if(!conn.length){addAI("🚀 **Deploy service connect नहीं!**\n\n☰ → Settings → Vercel/Netlify add करो");return;}const msgs=document.getElementById("msgs");const r=document.createElement("div");r.className="mr ai";r.innerHTML=`<div class="mav">⚡</div><div class="mbd"><div class="mnm">DEV.AI</div><div class="mbb"><div class="macts">${conn.map(s=>`<button class="mact pr" onclick="dpTo('${s}')">→ ${s}</button>`).join("")}</div></div></div>`;msgs.appendChild(r);scr();}
+async function dpTo(svc){if(svc==="vercel"){const token=S.tok.vercel;const ed=document.getElementById("ced");if(ed)S.files[S.af]=ed.value;try{const res=await fetch("https://api.vercel.com/v13/deployments",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({name:S.gh.r||"devai-project",files:Object.entries(S.files).map(([f,d])=>({file:f,data:d})),projectSettings:{framework:null}})});const data=await res.json();if(res.ok&&data.url){const url="https://"+data.url;toast("✓ Deployed!","ok");addAI("✅ **Vercel Deploy!**\n\n🔗 "+url);}else throw new Error(data.error?.message||"Failed");}catch(e){toast("Vercel: "+e.message,"err");}}else addAI(`🚀 **${svc}:** GitHub push करो → ${svc}.com पर repo connect करो → auto deploy!`);}
+
+function openEd(){renderEt();updEC();openPan("edPan");setupEd();}
+function renderEt(){const bar=document.getElementById("etbs");if(!bar)return;bar.innerHTML=Object.keys(S.files).map(f=>`<div class="et${f===S.af?" act":""}" onclick="swT('${f}')">${gIc(f)} ${f}<span class="etx" onclick="dlT('${f}',event)">×</span></div>`).join("")+`<div class="etn" onclick="nwF()">＋</div>`;}
+function gIc(n){if(n.endsWith(".html"))return"🌐";if(n.endsWith(".css"))return"🎨";if(n.endsWith(".js")||n.endsWith(".jsx"))return"📜";if(n.endsWith(".ts"))return"🔷";if(n.endsWith(".py"))return"🐍";return"📄";}
+function updEC(){const ed=document.getElementById("ced");if(!ed)return;ed.value=S.files[S.af]||"";updLN();updES();}
+function updLN(){const ed=document.getElementById("ced"),ln=document.getElementById("ln");if(!ed||!ln)return;const n=(ed.value.match(/\n/g)||[]).length+1;ln.innerHTML=Array.from({length:n},(_,i)=>i+1).join("<br>");}
+function updES(){const ed=document.getElementById("ced");if(!ed)return;const ls=ed.value.substr(0,ed.selectionStart).split("\n");const cur=document.getElementById("eCur"),lg=document.getElementById("eLng");if(cur)cur.textContent=`Ln ${ls.length}, Col ${ls[ls.length-1].length+1}`;if(lg){const ext=S.af.split(".").pop();const m={js:"JavaScript",jsx:"React JSX",html:"HTML",css:"CSS",py:"Python",json:"JSON"};lg.textContent=m[ext]||ext.toUpperCase();}}
+function swT(f){const ed=document.getElementById("ced");if(ed)S.files[S.af]=ed.value;S.af=f;renderEt();updEC();}
+function dlT(f,e){e.stopPropagation();if(Object.keys(S.files).length<=1){toast("Last file!","err");return;}delete S.files[f];if(S.af===f)S.af=Object.keys(S.files)[0];renderEt();updEC();}
+function nwF(){const n=prompt("File name:");if(!n?.trim())return;S.files[n.trim()]="";S.af=n.trim();renderEt();updEC();}
+function saveFs(){const ed=document.getElementById("ced");if(ed)S.files[S.af]=ed.value;sv();toast("✓ Saved!","ok");}
+let _ed=false;
+function setupEd(){const ed=document.getElementById("ced");if(!ed||_ed)return;_ed=true;ed.addEventListener("input",()=>{S.files[S.af]=ed.value;updLN();});ed.addEventListener("keydown",e=>{if(e.key==="Tab"){e.preventDefault();const s=ed.selectionStart;ed.value=ed.value.substring(0,s)+"  "+ed.value.substring(ed.selectionEnd);ed.selectionStart=ed.selectionEnd=s+2;}if(e.ctrlKey&&e.key==="s"){e.preventDefault();saveFs();}});ed.addEventListener("keyup",updES);ed.addEventListener("click",updES);ed.addEventListener("scroll",()=>{const n=document.getElementById("ln");if(n)n.scrollTop=ed.scrollTop;});}
+
+function openSet(sec){renderSet(sec||"general");openPan("setPan");}
+function renderSet(sec){const body=document.getElementById("setBd");if(!body)return;const ns=["general","github","vercel","netlify","render","railway","cloudflare","codemagic"];const lb={general:"⚙",github:"🐙",vercel:"▲",netlify:"◆",render:"🟣",railway:"🚂",cloudflare:"☁",codemagic:"🪄"};body.innerHTML=`<div class="snv">${ns.map(n=>`<div class="sni${n===sec?" act":""}" onclick="renderSet('${n}')">${lb[n]} ${n}</div>`).join("")}</div>${rSC(sec)}`;}
+function rSC(s){if(s==="general")return`<div class="ssc"><div class="sst">Account</div><div class="scd"><div class="sch2"><div class="sct">${S.user?"👤 "+getDN(S.user):"Not logged in"}</div><button class="sbtn2${S.user?" dg":" pr"}" onclick="doAuth();closePan()">${S.user?"Logout":"Login with Puter"}</button></div><div class="sdsc">Puter.js — free AI, no API key needed.</div></div></div><div class="ssc"><div class="sst">Theme</div><div class="scd"><div class="sch2"><div class="sct">${S.theme==="dark"?"🌙 Dark":"☀ Light"}</div><button class="sbtn2 pr" onclick="toggleTh()">Switch</button></div></div></div>`;
+const info={github:{n:"GitHub",h:"github.com → Settings → Developer Settings → Personal Access Tokens → repo scope",ph:"ghp_xxxxxxxxxxxxxxxxxxxx",ex:`<div class="scd" style="margin-top:8px"><div class="sst">Repo Details</div><input class="sinp" id="sg_u" placeholder="GitHub username" value="${S.gh.u}"><input class="sinp" id="sg_r" placeholder="Repository name" value="${S.gh.r}"><input class="sinp" id="sg_b" placeholder="Branch (main)" value="${S.gh.b}"><button class="ssv" style="margin-top:8px;width:100%" onclick="svGH()">Save Details</button></div>`},vercel:{n:"Vercel",h:"vercel.com → Settings → Tokens",ph:"Bearer xxxxxxxxxxxxxxxx"},netlify:{n:"Netlify",h:"app.netlify.com → User Settings → Applications",ph:"xxxxxxxxxxxxxxxxxx"},render:{n:"Render",h:"dashboard.render.com → Account → API Keys",ph:"rnd_xxxxxxxxxxxxxx"},railway:{n:"Railway",h:"railway.app → Account → Tokens",ph:"xxxxxxxx-xxxx"},cloudflare:{n:"Cloudflare",h:"dash.cloudflare.com → Profile → API Tokens",ph:"xxxxxxxxxxxxxxxxxxxxxxxx"},codemagic:{n:"Codemagic APK",h:"codemagic.io → Teams → API Keys",ph:"CM API Key"}};
+const d=info[s];if(!d)return"";const con=!!S.tok[s];return`<div class="ssc"><div class="sst">${d.n}</div><div class="scd"><div class="sch2"><div class="sct">API Token</div><span class="${con?"cbdg":"dbdg"}">${con?"✓ Connected":"✗ Not Set"}</span></div><div class="sdsc">${d.h}</div><div class="sinr"><input class="sinp" id="si_${s}" type="password" placeholder="${d.ph}" value="${S.tok[s]}" style="flex:1;margin-top:0"><button class="seye" onclick="togSI('si_${s}',this)">👁</button><button class="ssv" onclick="svSI('${s}','si_${s}')">Save</button></div></div>${d.ex||""}</div>`;}
+function togSI(id,btn){const i=document.getElementById(id);if(!i)return;i.type=i.type==="password"?"text":"password";btn.textContent=i.type==="password"?"👁":"🙈";}
+async function svSI(k,id){const v=document.getElementById(id)?.value.trim()||"";S.tok[k]=v;sv();if(S.uid&&window.FB)await FB.st(S.uid,S.tok);updB();toast("✓ "+k+" saved!","ok");renderSet(k);}
+function svGH(){S.gh.u=document.getElementById("sg_u")?.value.trim()||"";S.gh.r=document.getElementById("sg_r")?.value.trim()||"";S.gh.b=document.getElementById("sg_b")?.value.trim()||"main";sv();toast("✓ GitHub details saved!","ok");}
+
+function openPan(id){closePan(false);document.getElementById("povl").classList.add("open");document.getElementById(id).classList.add("open");}
+function closePan(s=true){document.getElementById("povl").classList.remove("open");document.querySelectorAll(".pan").forEach(p=>p.classList.remove("open"));if(s){const ed=document.getElementById("ced");if(ed)S.files[S.af]=ed.value;sv();}}
+function openTrm(){openPan("trmPan");}
+function tlog(msg,type=""){const t=document.getElementById("trmOut");if(!t)return;const c={info:"#38bdf8",ok:"#3dd68c",warn:"#f5a623",err:"#ff5f5f"};t.innerHTML+=`<span style="color:${c[type]||"#a3e635"}">${msg}</span><br>`;t.scrollTop=t.scrollHeight;}
+function toast(msg,type=""){const t=document.getElementById("toast");if(!t)return;t.textContent=msg;t.className="toast show"+(type==="ok"?" ok":type==="err"?" err":"");clearTimeout(window._tt);window._tt=setTimeout(()=>t.className="toast",2800);}
+
+document.addEventListener("DOMContentLoaded",async()=>{
+  applyTh(localStorage.getItem("d_th")||"light");
+  initMods();initSggs();updB();
+  const st=document.getElementById("mSt");
+  try{
+    await new Promise(r=>{if(typeof puter!=="undefined")r();else window.addEventListener("load",()=>setTimeout(r,800));});
+    if(typeof puter!=="undefined"){if(st)st.textContent="Puter Ready ✓";const isIn=await puter.auth.isSignedIn().catch(()=>false);if(isIn){const u=await puter.auth.getUser().catch(()=>null);if(u)await onLogin(u);}}
+    else{if(st)st.textContent="Ready";}
+  }catch(e){if(st)st.textContent="Ready";}
+});
+</script>
+</body>
+</html>
